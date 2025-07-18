@@ -187,27 +187,28 @@
 
     function submitData(paymentMethod) {
       let data = {
-        lotion: parseInt(inputs[0].value) || 0,
-        cream: parseInt(inputs[1].value) || 0,
-        ampoule: parseInt(inputs[2].value) || 0,
-        hydratingCream: parseInt(inputs[3].value) || 0,
-        essence: parseInt(inputs[4].value) || 0,
-        dryShampoo: parseInt(inputs[5].value) || 0,
-        bodySet: parseInt(inputs[6].value) || 0,
-        totalQty: parseInt(totalQtyEl.textContent.replace(/[^0-9]/g, '')),
-        totalPrice: parseInt(totalPriceEl.textContent.replace(/[^0-9]/g, '')),
-        payment: paymentMethod
+        "entry.641954362": new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
+        "entry.73760492": parseInt(inputs[0].value) || 0,
+        "entry.358376705": parseInt(inputs[1].value) || 0,
+        "entry.527065283": parseInt(inputs[2].value) || 0,
+        "entry.661056142": parseInt(inputs[3].value) || 0,
+        "entry.1954562651": parseInt(inputs[4].value) || 0,
+        "entry.1894876668": parseInt(inputs[5].value) || 0,
+        "entry.1329246249": parseInt(inputs[6].value) || 0,
+        "entry.307730166": parseInt(totalQtyEl.textContent.replace(/[^0-9]/g, '')),
+        "entry.1312485185": parseInt(totalPriceEl.textContent.replace(/[^0-9]/g, '')),
+        "entry.1707516238": paymentMethod
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbyXFMH8V1GTZnyBjnGHVzEd-3U1jn_mcpmVI5j_pQ9CHWicS4qyiss3nfQX38UnU83D/exec", {
+      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScLEBK_7dlg1NY2qcan0z15Z9NtsB6hNzn8pBzoAzWrK7lyHg/formResponse";
+
+      fetch(formUrl, {
         method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(data)
       })
-      .then(res => res.text())
-      .then(text => alert("전송되었습니다."))
+      .then(() => alert("전송되었습니다."))
       .catch(err => alert("오류 발생: " + err));
     }
   </script>
