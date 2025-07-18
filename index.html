@@ -27,22 +27,40 @@
       border: 2px solid #ffd1a6;
       border-radius: 8px;
       padding: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     .summary-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
-      text-align: center;
     }
-    .summary-grid div,
-    .gift-line {
+    .summary-grid div {
       font-size: 14px;
       font-weight: bold;
+      text-align: center;
     }
     .gift-line {
       grid-column: span 2;
       margin-top: 4px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: left;
+    }
+    .payment-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 8px;
+    }
+    .payment-buttons button {
+      flex: 1;
+      padding: 8px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: #ff7e00;
+      color: #fff;
+      cursor: pointer;
     }
     .item {
       background: #fff;
@@ -89,6 +107,11 @@
       <div id="total-price">총 가격: 0원</div>
       <div class="gift-line" id="gift">사은품:</div>
     </div>
+  </div>
+
+  <div class="payment-buttons">
+    <button id="pay-transfer">계좌이체</button>
+    <button id="pay-card">카드</button>
   </div>
 
   <div class="item"><span>올인원 로션 (26,600원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
@@ -157,6 +180,14 @@
       inputs.forEach(input => input.value = "");
       updateTotal();
     });
+
+    document.getElementById("pay-transfer").addEventListener("click", () => submitData("계좌이체"));
+    document.getElementById("pay-card").addEventListener("click", () => submitData("카드"));
+
+    function submitData(paymentMethod) {
+      alert(`결제 수단: ${paymentMethod}\n(※ 실제 연동은 추후 구현됩니다)`);
+      // 여기에 fetch 로직 추가 예정
+    }
   </script>
 </body>
 </html>
