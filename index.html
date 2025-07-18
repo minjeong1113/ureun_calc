@@ -45,6 +45,7 @@
       font-size: 14px;
       font-weight: bold;
       text-align: left;
+      justify-self: start;
     }
     .payment-buttons {
       display: flex;
@@ -185,8 +186,29 @@
     document.getElementById("pay-card").addEventListener("click", () => submitData("카드"));
 
     function submitData(paymentMethod) {
-      alert(`결제 수단: ${paymentMethod}\n(※ 실제 연동은 추후 구현됩니다)`);
-      // 여기에 fetch 로직 추가 예정
+      let data = {
+        lotion: parseInt(inputs[0].value) || 0,
+        cream: parseInt(inputs[1].value) || 0,
+        ampoule: parseInt(inputs[2].value) || 0,
+        hydratingCream: parseInt(inputs[3].value) || 0,
+        essence: parseInt(inputs[4].value) || 0,
+        dryShampoo: parseInt(inputs[5].value) || 0,
+        bodySet: parseInt(inputs[6].value) || 0,
+        totalQty: parseInt(totalQtyEl.textContent.replace(/[^0-9]/g, '')),
+        totalPrice: parseInt(totalPriceEl.textContent.replace(/[^0-9]/g, '')),
+        payment: paymentMethod
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbzzB-5rZatVCdgZRsmROZ9RtBeoOPCkgOtF_tvd4sEqVPTxABkOr3SEZB3jhuf-d8fe/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.text())
+      .then(text => alert("전송되었습니다."))
+      .catch(err => alert("오류 발생: " + err));
     }
   </script>
 </body>
