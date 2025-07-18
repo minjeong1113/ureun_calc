@@ -40,13 +40,13 @@
 </head>
 <body>
   <h2>유아른 계산기</h2>
-  <div class="item"><span>올인원 로션 (26,600)</span><input type="number" min="0" step="1" value="" data-price="26600"></div>
-  <div class="item"><span>나이트 베리어 크림 (25,200)</span><input type="number" min="0" step="1" value="" data-price="25200"></div>
-  <div class="item"><span>아하파하 앰플 (29,400)</span><input type="number" min="0" step="1" value="" data-price="29400"></div>
-  <div class="item"><span>수분 앰플 크림 (22,400)</span><input type="number" min="0" step="1" value="" data-price="22400"></div>
-  <div class="item"><span>사철쑥 에센스 (24,500)</span><input type="number" min="0" step="1" value="" data-price="24500"></div>
-  <div class="item"><span>드라이 샴푸 앰플 (14,400)</span><input type="number" min="0" step="1" value="" data-price="14400"></div>
-  <div class="item"><span>비건 바디 세트 (44,800)</span><input type="number" min="0" step="1" value="" data-price="44800"></div>
+  <div class="item"><span>올인원 로션 (26,600)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
+  <div class="item"><span>나이트 베리어 크림 (25,200)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="25200"></div>
+  <div class="item"><span>아하파하 앰플 (29,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="29400"></div>
+  <div class="item"><span>수분 앰플 크림 (22,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="22400"></div>
+  <div class="item"><span>사철쑥 에센스 (24,500)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="24500"></div>
+  <div class="item"><span>드라이 샴푸 앰플 (14,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="14400"></div>
+  <div class="item"><span>비건 바디 세트 (44,800)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="44800"></div>
 
   <button id="reset">초기화</button>
   <div id="total">총합: 0원</div>
@@ -79,8 +79,18 @@
       giftEl.textContent = gift;
     }
 
-    inputs.forEach(input => {
+    inputs.forEach((input, index) => {
       input.addEventListener('input', updateTotal);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          } else {
+            inputs[0].focus();
+          }
+        }
+      });
     });
 
     resetBtn.addEventListener('click', () => {
