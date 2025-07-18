@@ -182,10 +182,17 @@
       updateTotal();
     });
 
-    document.getElementById("pay-transfer").addEventListener("click", () => submitData("계좌이체"));
-    document.getElementById("pay-card").addEventListener("click", () => submitData("카드"));
+    const buttons = document.querySelectorAll(".payment-buttons button");
 
-    function submitData(paymentMethod) {
+    buttons.forEach(button => {
+      button.addEventListener("click", function () {
+        buttons.forEach(btn => btn.disabled = true);
+        button.textContent = "전송 중...";
+        submitData(button.textContent.includes("계좌") ? "계좌이체" : "카드", button);
+      });
+    });
+
+    function submitData(paymentMethod, button) {
       let data = {
         "entry.641954362": new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
         "entry.73760492": parseInt(inputs[0].value) || 0,
@@ -208,8 +215,18 @@
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(data)
       })
-      .then(() => alert("전송되었습니다."))
-      .catch(err => alert("오류 발생: " + err));
+      .then(() => {
+        alert("전송되었습니다.");
+        inputs.forEach(input => input.value = "");
+        updateTotal();
+        button.textContent = paymentMethod;
+        buttons.forEach(btn => btn.disabled = false);
+      })
+      .catch(err => {
+        alert("오류 발생: " + err);
+        button.textContent = paymentMethod;
+        buttons.forEach(btn => btn.disabled = false);
+      });
     }
   </script>
 </body>
