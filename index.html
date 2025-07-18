@@ -6,40 +6,59 @@
   <title>유아른 계산기</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
+      background-color: #f9f9f9;
     }
     h2 {
       text-align: center;
+      margin-bottom: 30px;
     }
     .item {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      margin-bottom: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+    }
+    .item span {
+      font-size: 16px;
+      font-weight: 500;
+      flex: 1;
     }
     .item input {
-      width: 60px;
+      width: 70px;
       text-align: center;
       font-size: 16px;
-    }
-    #total, #gift {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
+      padding: 6px;
     }
     #reset {
       display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
+      margin: 30px auto 20px;
+      padding: 12px 24px;
       font-size: 16px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #total, #gift {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
   <h2>유아른 계산기</h2>
+
   <div class="item"><span>올인원 로션 (26,600)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
   <div class="item"><span>나이트 베리어 크림 (25,200)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="25200"></div>
   <div class="item"><span>아하파하 앰플 (29,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="29400"></div>
@@ -67,7 +86,6 @@
       });
       totalEl.textContent = `총합: ${total.toLocaleString()}원`;
 
-      // 사은품 조건
       let gift = "사은품: 없음";
       if (total >= 100000) {
         gift = "사은품: 마스크팩 + 립밤 중 택1 + 리사이클파우치";
