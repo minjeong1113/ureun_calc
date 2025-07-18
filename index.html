@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>유아른 계산기</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .item input {
+      width: 60px;
+      text-align: center;
+      font-size: 16px;
+    }
+    #total, #gift {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+    #reset {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>유아른 계산기</h2>
+  <div class="item"><span>올인원 로션 (26,600)</span><input type="number" min="0" step="1" value="" data-price="26600"></div>
+  <div class="item"><span>나이트 베리어 크림 (25,200)</span><input type="number" min="0" step="1" value="" data-price="25200"></div>
+  <div class="item"><span>아하파하 앰플 (29,400)</span><input type="number" min="0" step="1" value="" data-price="29400"></div>
+  <div class="item"><span>수분 앰플 크림 (22,400)</span><input type="number" min="0" step="1" value="" data-price="22400"></div>
+  <div class="item"><span>사철쑥 에센스 (24,500)</span><input type="number" min="0" step="1" value="" data-price="24500"></div>
+  <div class="item"><span>드라이 샴푸 앰플 (14,400)</span><input type="number" min="0" step="1" value="" data-price="14400"></div>
+  <div class="item"><span>비건 바디 세트 (44,800)</span><input type="number" min="0" step="1" value="" data-price="44800"></div>
+
+  <button id="reset">초기화</button>
+  <div id="total">총합: 0원</div>
+  <div id="gift">사은품: 없음</div>
+
+  <script>
+    const inputs = document.querySelectorAll('input');
+    const totalEl = document.getElementById('total');
+    const giftEl = document.getElementById('gift');
+    const resetBtn = document.getElementById('reset');
+
+    function updateTotal() {
+      let total = 0;
+      inputs.forEach(input => {
+        const price = parseInt(input.dataset.price);
+        const qty = parseInt(input.value) || 0;
+        total += price * qty;
+      });
+      totalEl.textContent = `총합: ${total.toLocaleString()}원`;
+
+      // 사은품 조건
+      let gift = "사은품: 없음";
+      if (total >= 100000) {
+        gift = "사은품: 마스크팩 + 립밤 중 택1 + 리사이클파우치";
+      } else if (total >= 50000) {
+        gift = "사은품: 마스크팩 + 립밤 중 택1";
+      } else if (total >= 30000) {
+        gift = "사은품: 마스크팩";
+      }
+      giftEl.textContent = gift;
+    }
+
+    inputs.forEach(input => {
+      input.addEventListener('input', updateTotal);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      inputs.forEach(input => input.value = "");
+      updateTotal();
+    });
+  </script>
+</body>
+</html>
