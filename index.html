@@ -14,7 +14,20 @@
     }
     h2 {
       text-align: center;
+      margin-bottom: 10px;
+    }
+    .summary {
+      background: #fff2e6;
+      border: 2px solid #ffd1a6;
+      border-radius: 10px;
+      padding: 16px;
       margin-bottom: 30px;
+      text-align: center;
+    }
+    .summary div {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 5px 0;
     }
     .item {
       background: #fff;
@@ -30,6 +43,7 @@
       font-size: 16px;
       font-weight: 500;
       flex: 1;
+      cursor: pointer;
     }
     .item input {
       width: 70px;
@@ -39,7 +53,7 @@
     }
     #reset {
       display: block;
-      margin: 30px auto 20px;
+      margin: 30px auto 10px;
       padding: 12px 24px;
       font-size: 16px;
       background-color: #444;
@@ -48,43 +62,46 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    #total, #gift {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-      font-size: 18px;
-    }
   </style>
 </head>
 <body>
   <h2>유아른 계산기</h2>
 
-  <div class="item"><span>올인원 로션 (26,600)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
-  <div class="item"><span>나이트 베리어 크림 (25,200)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="25200"></div>
-  <div class="item"><span>아하파하 앰플 (29,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="29400"></div>
-  <div class="item"><span>수분 앰플 크림 (22,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="22400"></div>
-  <div class="item"><span>사철쑥 에센스 (24,500)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="24500"></div>
-  <div class="item"><span>드라이 샴푸 앰플 (14,400)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="14400"></div>
-  <div class="item"><span>비건 바디 세트 (44,800)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="44800"></div>
+  <div class="summary">
+    <div id="total">총합: 0원</div>
+    <div id="quantity">총 수량: 0개</div>
+    <div id="gift">사은품: 없음</div>
+  </div>
+
+  <div class="item"><span>올인원 로션 (26,600원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
+  <div class="item"><span>나이트 베리어 크림 (25,200원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="25200"></div>
+  <div class="item"><span>아하파하 앰플 (29,400원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="29400"></div>
+  <div class="item"><span>수분 앰플 크림 (22,400원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="22400"></div>
+  <div class="item"><span>사철쑥 에센스 (24,500원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="24500"></div>
+  <div class="item"><span>드라이 샴푸 앰플 (14,400원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="14400"></div>
+  <div class="item"><span>비건 바디 세트 (44,800원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="44800"></div>
 
   <button id="reset">초기화</button>
-  <div id="total">총합: 0원</div>
-  <div id="gift">사은품: 없음</div>
 
   <script>
+    const items = document.querySelectorAll('.item');
     const inputs = document.querySelectorAll('input');
     const totalEl = document.getElementById('total');
+    const quantityEl = document.getElementById('quantity');
     const giftEl = document.getElementById('gift');
     const resetBtn = document.getElementById('reset');
 
     function updateTotal() {
       let total = 0;
+      let totalQty = 0;
       inputs.forEach(input => {
         const price = parseInt(input.dataset.price);
         const qty = parseInt(input.value) || 0;
         total += price * qty;
+        totalQty += qty;
       });
       totalEl.textContent = `총합: ${total.toLocaleString()}원`;
+      quantityEl.textContent = `총 수량: ${totalQty}개`;
 
       let gift = "사은품: 없음";
       if (total >= 100000) {
@@ -108,6 +125,16 @@
             inputs[0].focus();
           }
         }
+      });
+    });
+
+    items.forEach(item => {
+      const span = item.querySelector('span');
+      const input = item.querySelector('input');
+      span.addEventListener('click', () => {
+        const current = parseInt(input.value) || 0;
+        input.value = current + 1;
+        updateTotal();
       });
     });
 
