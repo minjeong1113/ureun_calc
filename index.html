@@ -7,8 +7,8 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
-      max-width: 600px;
+      padding: 10px;
+      max-width: 480px;
       margin: auto;
       background-color: #f9f9f9;
     }
@@ -16,53 +16,63 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
     h2 {
       margin: 0;
+      font-size: 18px;
     }
     .summary {
       background: #fff2e6;
       border: 2px solid #ffd1a6;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 30px;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
       text-align: center;
     }
-    .summary div {
-      font-size: 18px;
+    .summary-grid div,
+    .gift-line {
+      font-size: 14px;
       font-weight: bold;
-      margin: 5px 0;
+    }
+    .gift-line {
+      grid-column: span 2;
+      margin-top: 4px;
     }
     .item {
       background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      padding: 16px;
-      margin-bottom: 15px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 10px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    .item span {
-      font-size: 16px;
-      font-weight: 500;
-      flex: 1;
       cursor: pointer;
     }
+    .item span {
+      font-size: 14px;
+      font-weight: 500;
+      flex: 1;
+    }
     .item input {
-      width: 70px;
+      width: 50px;
       text-align: center;
-      font-size: 16px;
-      padding: 6px;
+      font-size: 14px;
+      padding: 4px;
     }
     #reset {
-      padding: 8px 16px;
-      font-size: 14px;
+      padding: 6px 12px;
+      font-size: 12px;
       background-color: #444;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
     }
   </style>
@@ -74,8 +84,11 @@
   </div>
 
   <div class="summary">
-    <div id="summary-line">총 수량: 0개 | 총 가격: 0원</div>
-    <div id="gift">사은품:</div>
+    <div class="summary-grid">
+      <div id="total-qty">총 수량: 0개</div>
+      <div id="total-price">총 가격: 0원</div>
+      <div class="gift-line" id="gift">사은품:</div>
+    </div>
   </div>
 
   <div class="item"><span>올인원 로션 (26,600원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
@@ -89,7 +102,8 @@
   <script>
     const items = document.querySelectorAll('.item');
     const inputs = document.querySelectorAll('input');
-    const summaryLineEl = document.getElementById('summary-line');
+    const totalQtyEl = document.getElementById('total-qty');
+    const totalPriceEl = document.getElementById('total-price');
     const giftEl = document.getElementById('gift');
     const resetBtn = document.getElementById('reset');
 
@@ -102,7 +116,8 @@
         total += price * qty;
         totalQty += qty;
       });
-      summaryLineEl.textContent = `총 수량: ${totalQty}개 | 총 가격: ${total.toLocaleString()}원`;
+      totalQtyEl.textContent = `총 수량: ${totalQty}개`;
+      totalPriceEl.textContent = `총 가격: ${total.toLocaleString()}원`;
 
       let gift = "사은품:";
       if (total >= 100000) {
@@ -130,9 +145,8 @@
     });
 
     items.forEach(item => {
-      const span = item.querySelector('span');
       const input = item.querySelector('input');
-      span.addEventListener('click', () => {
+      item.addEventListener('click', () => {
         const current = parseInt(input.value) || 0;
         input.value = current + 1;
         updateTotal();
