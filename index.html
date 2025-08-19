@@ -21,10 +21,10 @@
 
     .page{max-width:2360px;margin:8px auto;padding:0 14px;
       display:grid;grid-template-columns:3fr 2fr;gap:20px;min-height:calc(100dvh - 16px);}
-    header{grid-column:1/-1;margin:0 0 6px}
+    header{grid-column:1/-1;margin:0}
     h1{margin:0;font-size:18px;font-weight:800;}
 
-    .cat{margin-top:8px}
+    .cat{margin-top:0}
     .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
     .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
     @media (max-width:1800px){ .grid{grid-template-columns:repeat(4,1fr);} }
@@ -59,7 +59,6 @@
     tbody tr:nth-child(even){background:#fafbff}
     .qtyCtl{display:inline-flex;align-items:center;gap:6px}
     .btn-sm{width:24px;height:24px;border:1px solid var(--line);background:#f3f5fa;border-radius:6px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center}
-    .del{border:none;background:transparent;color:#ef4444;cursor:pointer;font-size:18px;}
     .totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}
     .totalLine{display:flex;justify-content:space-between;align-items:center}
     .gift{font-weight:800}
@@ -77,7 +76,14 @@
       <div id="cartEmpty" class="empty">아직 선택된 제품이 없습니다.</div>
       <div id="cartWrap" style="display:none">
         <table>
-          <thead><tr><th style="width:46%">상품명</th><th style="width:16%">수량</th><th style="width:18%">단가</th><th style="width:18%">금액</th><th style="width:2%"></th></tr></thead>
+          <thead>
+            <tr>
+              <th style="width:50%">상품명</th>
+              <th style="width:16%">수량</th>
+              <th style="width:17%">단가</th>
+              <th style="width:17%">금액</th>
+            </tr>
+          </thead>
           <tbody id="cartBody"></tbody>
         </table>
         <div class="totals">
@@ -123,8 +129,15 @@
       });
 
       const keys = Object.keys(cart);
-      if (!keys.length){cartEmptyEl.style.display=''; cartWrapEl.style.display='none'; grandEl.textContent='0원'; giftEl.textContent='없음'; return;}
-      cartEmptyEl.style.display='none'; cartWrapEl.style.display='';
+      if (!keys.length){
+        cartEmptyEl.style.display=''; 
+        cartWrapEl.style.display='none'; 
+        grandEl.textContent='0원'; 
+        giftEl.textContent='없음'; 
+        return;
+      }
+      cartEmptyEl.style.display='none'; 
+      cartWrapEl.style.display='';
 
       let total=0;
       cartBodyEl.innerHTML = keys.map(k=>{
@@ -132,8 +145,8 @@
         return `<tr data-key="${k}">
           <td class="nameCell" title="${p.name}">${p.name}</td>
           <td><div class="qtyCtl"><button class="btn-sm" data-act="minus">−</button><span>${q}</span><button class="btn-sm" data-act="plus">＋</button></div></td>
-          <td>${p.price.toLocaleString()}원</td><td>${sub.toLocaleString()}원</td>
-          <td><button class="del" data-act="del">✕</button></td>
+          <td>${p.price.toLocaleString()}원</td>
+          <td>${sub.toLocaleString()}원</td>
         </tr>`;
       }).join('');
 
@@ -146,7 +159,6 @@
       const key=e.target.closest('tr')?.dataset?.key; if(!key) return;
       if (btn.dataset.act==='plus') cart[key]=(cart[key]||0)+1;
       else if (btn.dataset.act==='minus'){ if ((cart[key]||0)>0) cart[key]--; if (cart[key]===0) delete cart[key]; }
-      else if (btn.dataset.act==='del'){ delete cart[key]; }
       render();
     });
 
