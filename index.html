@@ -2,10 +2,12 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>유아른 계산기 (블록형)</title>
+  <title>유아른 계산기 (블록형+리스트)</title>
   <style>
-    body { font-family:sans-serif; max-width:900px; margin:20px auto; }
-    h2 { text-align:center; }
+    body { font-family:sans-serif; max-width:1200px; margin:20px auto; display:flex; gap:30px; }
+    h2 { text-align:center; grid-column: span 4; }
+    .left { flex:2; }
+    .right { flex:1; border:1px solid #ccc; border-radius:8px; padding:15px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -15,28 +17,39 @@
     .product {
       border:1px solid #ccc;
       border-radius:8px;
-      padding:15px;
+      padding:10px;
       text-align:center;
-      cursor:pointer;
       background:#f9f9f9;
       transition:0.2s;
     }
-    .product:hover { background:#eef; }
-    .product.active { background:#dbeafe; border-color:#60a5fa; }
-    .summary {
-      text-align:center;
-      margin-top:20px;
-      font-weight:bold;
+    .product:hover { background:#eef; cursor:pointer; }
+    .product.active { border-color:#60a5fa; background:#e0f2fe; }
+    .qtyControl {
+      display:flex; justify-content:center; align-items:center; gap:6px; margin-top:8px;
     }
+    .qtyControl button {
+      width:24px; height:24px; border:none; border-radius:4px; background:#ddd; cursor:pointer;
+    }
+    .qtyControl span { min-width:20px; display:inline-block; text-align:center; }
+    .summary { margin-top:20px; font-weight:bold; }
     #reset { margin:20px auto; display:block; padding:8px 16px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th,td { border:1px solid #ddd; padding:6px; font-size:14px; text-align:center; }
+    th { background:#f3f4f6; }
   </style>
 </head>
 <body>
-  <h2>유아른 계산기</h2>
-  <div class="grid" id="productGrid"></div>
-  <button id="reset">초기화</button>
-  <div class="summary" id="total">총합: 0원</div>
-  <div class="summary" id="gift">사은품: 없음</div>
+  <div class="left">
+    <h2>유아른 계산기</h2>
+    <div class="grid" id="productGrid"></div>
+    <button id="reset">초기화</button>
+  </div>
+  <div class="right">
+    <h3>선택한 상품</h3>
+    <div id="cartList">아직 선택된 상품이 없습니다.</div>
+    <div class="summary" id="total">총합: 0원</div>
+    <div class="summary" id="gift">사은품: 없음</div>
+  </div>
 
   <script>
     const products = [
@@ -66,42 +79,78 @@
     const grid = document.getElementById('productGrid');
     const totalEl = document.getElementById('total');
     const giftEl = document.getElementById('gift');
+    const cartList = document.getElementById('cartList');
     const resetBtn = document.getElementById('reset');
-
     let cart = {};
 
-    // 상품 버튼 생성
+    // 상품 블록 생성
     products.forEach((p,i)=>{
       const div = document.createElement('div');
       div.className = 'product';
-      div.innerHTML = `<div>${p.name}</div><div>${p.price.toLocaleString()}원</div>`;
-      div.addEventListener('click', ()=>{
-        cart[i] = (cart[i]||0) + 1;
-        div.classList.add('active');
-        updateTotal();
+      div.innerHTML = `<div>${p.name}</div><div>${p.price.toLocaleString()}원</div>
+        <div class="qtyControl">
+          <button>-</button>
+          <span id="qty-${i}">0</span>
+          <button>+</button>
+        </div>`;
+      const [minus, qtySpan, plus] = div.querySelectorAll('.qtyControl *');
+
+      plus.addEventListener('click',(e)=>{
+        e.stopPropagation();
+        cart[i]=(cart[i]||0)+1;
+        update();
+      });
+      minus.addEventListener('click',(e)=>{
+        e.stopPropagation();
+        if(cart[i]>0){ cart[i]--; if(cart[i]===0) delete cart[i]; }
+        update();
+      });
+      div.addEventListener('click',()=>{
+        cart[i]=(cart[i]||0)+1;
+        update();
       });
       grid.appendChild(div);
     });
 
-    function updateTotal(){
+    function update(){
       let total=0;
-      Object.keys(cart).forEach(idx=>{
-        total += cart[idx]*products[idx].price;
+      products.forEach((p,i)=>{
+        const qty=cart[i]||0;
+        const qtySpan=document.getElementById(`qty-${i}`);
+        if(qtySpan) qtySpan.textContent=qty;
+        total+=qty*p.price;
       });
-      totalEl.textContent = `총합: ${total.toLocaleString()}원`;
+      totalEl.textContent=`총합: ${total.toLocaleString()}원`;
 
       let gift="사은품: 없음";
       if (total>=100000) gift="사은품: 마스크팩 + 립밤 중 택1 + 리사이클파우치";
       else if (total>=50000) gift="사은품: 마스크팩 + 립밤 중 택1";
       else if (total>=30000) gift="사은품: 마스크팩";
       giftEl.textContent=gift;
+
+      // cart list
+      if(Object.keys(cart).length===0){
+        cartList.textContent="아직 선택된 상품이 없습니다.";
+      } else {
+        let html="<table><tr><th>상품명</th><th>수량</th><th>단가</th><th>금액</th></tr>";
+        Object.keys(cart).forEach(idx=>{
+          const i=parseInt(idx);
+          html+=`<tr><td>${products[i].name}</td>
+                    <td>${cart[i]}</td>
+                    <td>${products[i].price.toLocaleString()}</td>
+                    <td>${(cart[i]*products[i].price).toLocaleString()}</td></tr>`;
+        });
+        html+="</table>";
+        cartList.innerHTML=html;
+      }
     }
 
-    resetBtn.addEventListener('click', ()=>{
+    resetBtn.addEventListener('click',()=>{
       cart={};
-      document.querySelectorAll('.product').forEach(p=>p.classList.remove('active'));
-      updateTotal();
+      update();
     });
+
+    update();
   </script>
 </body>
 </html>
