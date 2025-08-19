@@ -154,4 +154,91 @@
     function renderCats(categories){
       Object.entries(categories).forEach(([catName, items],ci)=>{
         const sec=document.createElement('section');
-        sec.className=
+        sec.className='cat';
+        sec.innerHTML=`<h3>${catName}</h3><div class="grid"></div>`;
+        const grid=sec.querySelector('.grid');
+
+        items.forEach((p,pi)=>{
+          const key=`${ci}-${pi}`; productMap[key]=p;
+          const card=document.createElement('div');
+          card.className='product';
+          card.innerHTML=`
+            <img class="p-thumb" src="${p.img}" alt="${p.name}">
+            <div class="p-info">
+              <div class="p-name">${p.name}</div>
+              <div class="p-price">${p.price.toLocaleString()}원</div>
+              <div class="qtyRow" role="group" aria-label="${p.name} 수량 조절">
+                <button class="btn" data-act="minus">−</button>
+                <div class="badge" id="badge-${key}" aria-live="polite">0</div>
+                <button class="btn" data-act="plus">＋</button>
+              </div>
+            </div>
+          `;
+          card.addEventListener('click',(e)=>{
+            const act=e.target?.dataset?.act;
+            if(act==='minus'){
+              if((cart[key]||0)>0) cart[key]--;
+              if(cart[key]===0) delete cart[key];
+            }else if(act==='plus'||e.currentTarget===e.target){
+              cart[key]=(cart[key]||0)+1;
+            }
+            render();
+          });
+          grid.appendChild(card);
+        });
+        catsEl.appendChild(sec);
+      });
+    }
+
+    function render(){
+      Object.keys(productMap).forEach(k=>{
+        const el=document.getElementById(`badge-${k}`);
+        if(el) el.textContent=String(cart[k]||0);
+        const card=el?.closest('.product');
+        if(card){
+          if(cart[k]) card.classList.add('selected');
+          else card.classList.remove('selected');
+        }
+      });
+
+      const keys=Object.keys(cart);
+      if(!keys.length){
+        cartEmptyEl.style.display=''; cartWrapEl.style.display='none';
+        grandEl.textContent='0원'; giftEl.textContent='없음'; return;
+      }
+      cartEmptyEl.style.display='none'; cartWrapEl.style.display='';
+
+      let total=0;
+      cartBodyEl.innerHTML=keys.map(k=>{
+        const p=productMap[k], q=cart[k], sub=q*p.price; total+=sub;
+        return `<tr data-key="${k}">
+          <td class="nameCell">${p.name}</td>
+          <td>
+            <div class="qtyCtl">
+              <button class="btn-sm" data-act="minus">−</button>
+              <span>${q}</span>
+              <button class="btn-sm" data-act="plus">＋</button>
+            </div>
+          </td>
+          <td>${p.price.toLocaleString()}원</td>
+          <td>${sub.toLocaleString()}원</td>
+        </tr>`;
+      }).join('');
+
+      grandEl.textContent=`${total.toLocaleString()}원`;
+      giftEl.textContent=giftBy(total);
+    }
+
+    cartBodyEl.addEventListener('click',(e)=>{
+      const btn=e.target.closest('button'); if(!btn) return;
+      const tr=e.target.closest('tr'); const key=tr?.dataset?.key; if(!key) return;
+      const act=btn.dataset.act;
+      if(act==='plus') cart[key]=(cart[key]||0)+1;
+      else if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
