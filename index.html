@@ -6,228 +6,94 @@
   <title>유아른 계산기</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 10px;
-      max-width: 480px;
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
       margin: auto;
-      background-color: #f9f9f9;
     }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    h2 {
-      margin: 0;
-      font-size: 18px;
-    }
-    .summary {
-      background: #fff2e6;
-      border: 2px solid #ffd1a6;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-    .summary-grid div {
-      font-size: 14px;
-      font-weight: bold;
-      text-align: center;
-    }
-    .gift-line {
-      grid-column: span 2;
-      margin-top: 4px;
-      font-size: 14px;
-      font-weight: bold;
-      text-align: left;
-      justify-self: start;
-    }
-    .payment-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      gap: 8px;
-    }
-    .payment-buttons button {
-      flex: 1;
-      padding: 8px;
-      font-size: 14px;
-      border: none;
-      border-radius: 6px;
-      background-color: #ff7e00;
-      color: #fff;
-      cursor: pointer;
-    }
+    h2 { text-align: center; }
     .item {
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      padding: 10px;
-      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
+      margin-bottom: 10px;
     }
-    .item span {
-      font-size: 14px;
-      font-weight: 500;
-      flex: 1;
-    }
+    .item span { flex: 1; }
     .item input {
-      width: 50px;
+      width: 60px;
       text-align: center;
-      font-size: 14px;
-      padding: 4px;
+      font-size: 16px;
+    }
+    #total, #gift {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
     }
     #reset {
-      padding: 6px 12px;
-      font-size: 12px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h2>유아른 계산기</h2>
-    <button id="reset">초기화</button>
-  </div>
+  <h2>유아른 계산기</h2>
+  <div id="productList"></div>
 
-  <div class="summary">
-    <div class="summary-grid">
-      <div id="total-qty">총 수량: 0개</div>
-      <div id="total-price">총 가격: 0원</div>
-      <div class="gift-line" id="gift">사은품:</div>
-    </div>
-  </div>
-
-  <div class="payment-buttons">
-    <button id="pay-transfer">계좌이체</button>
-    <button id="pay-card">카드</button>
-  </div>
-
-  <div class="item"><span>올인원 로션 (26,600원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="26600"></div>
-  <div class="item"><span>나이트 베리어 크림 (25,200원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="25200"></div>
-  <div class="item"><span>아하파하 앰플 (29,400원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="29400"></div>
-  <div class="item"><span>수분 앰플 크림 (22,400원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="22400"></div>
-  <div class="item"><span>사철쑥 에센스 (24,500원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="24500"></div>
-  <div class="item"><span>드라이 샴푸 앰플 (14,400원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="14400"></div>
-  <div class="item"><span>비건 바디 세트 (44,800원)</span><input type="number" inputmode="numeric" min="0" step="1" value="" data-price="44800"></div>
+  <button id="reset">초기화</button>
+  <div id="total">총합: 0원</div>
+  <div id="gift">사은품: 없음</div>
 
   <script>
-    const items = document.querySelectorAll('.item');
-    const inputs = document.querySelectorAll('input');
-    const totalQtyEl = document.getElementById('total-qty');
-    const totalPriceEl = document.getElementById('total-price');
-    const giftEl = document.getElementById('gift');
-    const resetBtn = document.getElementById('reset');
+    // === 상품 배열 ===
+    const products = [
+      { name: "DIY 수제비 토너 패드 60매", price: 6500 },
+      { name: "화산석 오일 컨트롤 롤러", price: 9500 },
+      { name: "혈색 립밤 4.1g", price: 10000 },
+      { name: "촉촉 플럼핑 립밤 4.1g", price: 10000 },
+      { name: "촉촉촉 립밤 4.1g", price: 10000 },
+      { name: "드라이 샴푸 앰플 40ml", price: 13000 },
+      { name: "약알칼리성 콩클렌징 120ml", price: 16000 },
+      { name: "시아버터 인텐시브 핸드크림 100ml", price: 16000 },
+      { name: "마일드 에어핏 선세럼 50ml", price: 19000 },
+      { name: "티트리 시카 모공팩 100g", price: 19000 },
+      { name: "기초 4종 트래블키트", price: 19000 },
+      { name: "알로에 다시마 마스크팩 27ml 8매", price: 19000 },
+      { name: "동백 오일 세럼 미스트 100ml", price: 21000 },
+      { name: "수분 앰플 크림 55ml", price: 22000 },
+      { name: "바디 워시 300ml", price: 22000 },
+      { name: "바디 로션 300ml", price: 22000 },
+      { name: "사철쑥 추출물 에센스 200ml", price: 24000 },
+      { name: "나이트 베리어 크림 60ml", price: 25000 },
+      { name: "올인원 로션 110ml", price: 26000 },
+      { name: "아하파하 앰플 55ml", price: 29000 },
+      { name: "바디 케어 세트 300ml (워시+로션+샤워 타월)", price: 44000 },
+    ];
+
+    const productList = document.getElementById("productList");
+    const totalEl = document.getElementById("total");
+    const giftEl = document.getElementById("gift");
+    const resetBtn = document.getElementById("reset");
+
+    // 상품 DOM 자동 생성
+    products.forEach((p) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `<span>${p.name} (${p.price.toLocaleString()}원)</span>
+        <input type="number" min="0" step="1" value="" data-price="${p.price}">`;
+      productList.appendChild(div);
+    });
+
+    const inputs = document.querySelectorAll("#productList input");
 
     function updateTotal() {
       let total = 0;
-      let totalQty = 0;
       inputs.forEach(input => {
         const price = parseInt(input.dataset.price);
         const qty = parseInt(input.value) || 0;
         total += price * qty;
-        totalQty += qty;
       });
-      totalQtyEl.textContent = `총 수량: ${totalQty}개`;
-      totalPriceEl.textContent = `총 가격: ${total.toLocaleString()}원`;
+      totalEl.textContent = `총합: ${total.toLocaleString()}원`;
 
-      let gift = "사은품:";
-      if (total >= 100000) {
-        gift = "사은품: 마스크팩 + 립밤 중 택1 + 파우치";
-      } else if (total >= 50000) {
-        gift = "사은품: 마스크팩 + 립밤 중 택1";
-      } else if (total >= 30000) {
-        gift = "사은품: 마스크팩";
-      }
-      giftEl.textContent = gift;
-    }
-
-    inputs.forEach((input, index) => {
-      input.addEventListener('input', updateTotal);
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          if (index < inputs.length - 1) {
-            inputs[index + 1].focus();
-          } else {
-            inputs[0].focus();
-          }
-        }
-      });
-    });
-
-    items.forEach(item => {
-      const input = item.querySelector('input');
-      item.addEventListener('click', () => {
-        const current = parseInt(input.value) || 0;
-        input.value = current + 1;
-        updateTotal();
-      });
-    });
-
-    resetBtn.addEventListener('click', () => {
-      inputs.forEach(input => input.value = "");
-      updateTotal();
-    });
-
-    const buttons = document.querySelectorAll(".payment-buttons button");
-
-    buttons.forEach(button => {
-      button.addEventListener("click", function () {
-        buttons.forEach(btn => btn.disabled = true);
-        button.textContent = "전송 중...";
-        submitData(button.textContent.includes("계좌") ? "계좌이체" : "카드", button);
-      });
-    });
-
-    function submitData(paymentMethod, button) {
-      let data = {
-        "entry.641954362": new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
-        "entry.73760492": parseInt(inputs[0].value) || 0,
-        "entry.358376705": parseInt(inputs[1].value) || 0,
-        "entry.527065283": parseInt(inputs[2].value) || 0,
-        "entry.661056142": parseInt(inputs[3].value) || 0,
-        "entry.1954562651": parseInt(inputs[4].value) || 0,
-        "entry.1894876668": parseInt(inputs[5].value) || 0,
-        "entry.1329246249": parseInt(inputs[6].value) || 0,
-        "entry.307730166": parseInt(totalQtyEl.textContent.replace(/[^0-9]/g, '')),
-        "entry.1312485185": parseInt(totalPriceEl.textContent.replace(/[^0-9]/g, '')),
-        "entry.1707516238": paymentMethod
-      };
-
-      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScLEBK_7dlg1NY2qcan0z15Z9NtsB6hNzn8pBzoAzWrK7lyHg/formResponse";
-
-      fetch(formUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(data)
-      })
-      .then(() => {
-        alert("전송되었습니다.");
-        inputs.forEach(input => input.value = "");
-        updateTotal();
-        button.textContent = paymentMethod;
-        buttons.forEach(btn => btn.disabled = false);
-      })
-      .catch(err => {
-        alert("오류 발생: " + err);
-        button.textContent = paymentMethod;
-        buttons.forEach(btn => btn.disabled = false);
-      });
-    }
-  </script>
-</body>
-</html>
+      // 사은품 조건
