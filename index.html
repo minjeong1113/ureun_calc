@@ -37,14 +37,13 @@
 
     .product{
       background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
-      padding:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-height:120px;
-      cursor:pointer;
+      padding:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;cursor:pointer;
     }
-    .p-head{display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:center;min-height:70px}
+    .p-head{display:flex;justify-content:center;align-items:center;}
     .p-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;background:#eef2f7;display:block;}
-    .p-name{font-size:13px;font-weight:700;letter-spacing:-0.2px;line-height:1.35;
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-    .p-price{font-size:12.5px;color:var(--muted);text-align:right;margin-top:-2px}
+    .p-info{display:flex;flex-direction:column;gap:2px;margin-top:6px;}
+    .p-name{font-size:13px;font-weight:700;letter-spacing:-0.2px;line-height:1.35;}
+    .p-price{font-size:12.5px;color:var(--muted);text-align:left;}
     .qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:auto}
     .btn{border:1px solid var(--line);background:#f3f5fa;color:#111827;border-radius:10px;
       width:34px;height:34px;cursor:pointer;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;}
@@ -53,9 +52,9 @@
 
     .panel{
       background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
-      padding:12px;position:sticky;top:0; /* ← 카드 시작 위치와 맞춤 */
+      padding:12px;position:sticky;top:20px; /* ← 조금 밑으로 내림 */
       align-self:start;box-shadow:var(--shadow);
-      max-height:calc(100dvh - 12px);overflow:auto;min-width:560px;
+      max-height:calc(100dvh - 20px);overflow:auto;min-width:560px;
     }
     .panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
     .empty{padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:#6b7280;background:#fafbff}
@@ -101,7 +100,6 @@
 
   <script>
     const IMG_BASE="images";
-    // NO IMAGE 글자 제거 (회색 박스만)
     const PLACEHOLDER='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="100%" height="100%" fill="%23eef2f7"/></svg>';
 
     const categories=[
@@ -123,22 +121,6 @@
           {name:"혈색 립밤 4.1g",price:10000,img:"lipbalm-blue.webp"},
           {name:"촉촉 플럼핑 립밤 4.1g",price:10000,img:"lipbalm-plumping.webp"},
           {name:"촉촉촉 립밤 4.1g",price:10000,img:"lipbalm-moist.webp"},
-        ]
-      },
-      {
-        name:"미용소품",
-        items:[
-          {name:"DIY 수제비 토너 패드 60매",price:6500,img:"toner-pad.webp"},
-          {name:"화산석 오일 컨트롤 롤러",price:9500,img:"volcanic-roller.webp"},
-        ]
-      },
-      {
-        name:"바디케어",
-        items:[
-          {name:"시아버터 인텐시브 핸드크림 100ml",price:16000,img:"handcream.webp"},
-          {name:"바디 워시 300ml",price:22000,img:"bodywash.webp"},
-          {name:"바디 로션 300ml",price:22000,img:"bodylotion.webp"},
-          {name:"바디 케어 세트 300ml",price:44000,img:"bodyset.webp"},
         ]
       }
     ];
@@ -164,18 +146,21 @@
 
         const card=document.createElement('div');
         card.className='product';
-        card.innerHTML=`<div class="p-head">
-            <img class="p-thumb" alt="${p.name}" src="${src}" onerror="this.src='${PLACEHOLDER}'">
-            <div class="p-name">${p.name}</div>
+        card.innerHTML=`
+          <div class="p-head">
+            <img class="p-thumb" src="${src}" onerror="this.src='${PLACEHOLDER}'">
           </div>
-          <div class="p-price">${p.price.toLocaleString()}원</div>
+          <div class="p-info">
+            <div class="p-name">${p.name}</div>
+            <div class="p-price">${p.price.toLocaleString()}원</div>
+          </div>
           <div class="qtyRow">
             <button class="btn" data-act="minus">−</button>
             <div class="badge" id="badge-${key}">0</div>
             <button class="btn" data-act="plus">＋</button>
           </div>`;
 
-        // 카드 전체 클릭 → 수량 +1
+        // 카드 클릭 → 수량 증가
         card.addEventListener('click',e=>{
           const act=e.target?.dataset?.act;
           if(act==='minus'){
@@ -184,7 +169,6 @@
           } else if(act==='plus'){
             cart[key]=(cart[key]||0)+1;
           } else {
-            // 버튼 외 영역 클릭 시 수량 +1
             cart[key]=(cart[key]||0)+1;
           }
           render();
