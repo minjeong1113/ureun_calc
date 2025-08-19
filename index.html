@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>유아른 계산기 (패드 가로 · Pretendard)</title>
+  <title>유아른 계산기 (패드 가로 · Pretendard · 개선UI)</title>
 
-  <!-- Pretendard (CDN) -->
+  <!-- Pretendard -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
 
   <style>
     :root{
       --bg:#f7f8fb; --card:#ffffff; --line:#e6e8f0; --fg:#0e1116; --muted:#6b7280; --accent:#2563eb; --accent-ink:#ffffff;
-      --radius:16px; --radius-sm:10px; --shadow:0 8px 24px rgba(15,23,42,.06);
+      --radius:16px; --radius-sm:12px; --shadow:0 8px 24px rgba(15,23,42,.06);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -21,36 +21,36 @@
       font:14.5px/1.55 Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
     }
+
+    /* 레이아웃: 우측 폭 확장 (3:2), 상단 여백 최소화 */
     .page{
-      max-width:1400px;margin:20px auto;padding:0 18px;
-      display:grid;grid-template-columns:2fr 1fr;gap:24px;min-height:calc(100dvh - 40px);
+      max-width:1400px;margin:8px auto;padding:0 14px;
+      display:grid;grid-template-columns:3fr 2fr;gap:20px;min-height:calc(100dvh - 16px);
     }
-    header{grid-column:1/-1;margin-bottom:2px;display:flex;align-items:baseline;gap:12px}
-    h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-0.2px}
+    header{grid-column:1/-1;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+    h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-0.2px}
     .hint{color:var(--muted);font-size:12.5px}
 
-    /* 좌측: 카테고리 섹션 */
-    .cat{margin-top:16px}
-    .cat h3{margin:10px 2px 8px;font-size:14.5px;color:#111827;font-weight:700;letter-spacing:-0.2px}
+    /* 좌측: 카테고리 섹션 (상단 붙임) */
+    .cat{margin-top:10px}
+    .cat h3{margin:6px 2px 6px;font-size:14px;color:#111827;font-weight:700;letter-spacing:-0.2px}
     .grid{
-      display:grid;
-      /* iPad 가로(1024px+) 기준 4열, 더 좁아지면 3열/2열로 유연하게 */
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:12px;
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;
     }
     @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
     @media (max-width:880px){ .page{grid-template-columns:1fr} .grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
 
+    /* 상품 카드: 이미지 전제(고정 96px) + 흔들림 방지 */
     .product{
       background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);
-      padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:150px;
+      padding:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:168px;
       transition:transform .06s ease, box-shadow .2s ease; will-change:transform;
     }
     .product:active{transform:translateY(1px)}
     .p-thumb{
-      width:84px;height:84px;border-radius:12px;object-fit:cover;background:#eef2f7;margin:2px auto 4px auto;display:none;
+      width:96px;height:96px;border-radius:12px;object-fit:cover;background:#eef2f7;margin:0 auto 4px auto;display:block;
     }
-    .p-name{font-size:13.5px;font-weight:600;letter-spacing:-0.2px}
+    .p-name{font-size:13px;font-weight:600;letter-spacing:-0.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .p-price{font-size:12.5px;color:var(--muted)}
     .qtyRow{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:auto}
     .btn{
@@ -62,25 +62,28 @@
     .badge{min-width:34px;height:34px;border-radius:10px;background:#f8fafc;border:1px solid var(--line);
       display:flex;align-items:center;justify-content:center;font-weight:800}
 
-    /* 우측: 고정 패널(패드 가로에서 좌측과 높이감 비슷하게) */
+    /* 우측 패널: 좌측 시작선과 정렬, 가로 폭 확보, 줄바꿈 없이 표시 */
     .panel{
       background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      padding:14px 14px 16px;position:sticky;top:16px;align-self:start;box-shadow:var(--shadow);
-      max-height:calc(100dvh - 32px);overflow:auto;
+      padding:12px 12px 14px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
+      max-height:calc(100dvh - 12px);overflow:auto;min-width:520px;
     }
-    .panel h3{margin:0 0 10px;font-size:16px;font-weight:800}
+    .panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
     .empty{
-      padding:16px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);margin-top:8px;background:#fafbff;
+      padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);margin-top:6px;background:#fafbff;
     }
 
-    table{width:100%;border-collapse:separate;border-spacing:0;margin-top:8px;overflow:hidden;border-radius:12px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:separate;border-spacing:0;margin-top:6px;overflow:hidden;border-radius:12px;border:1px solid var(--line);table-layout:fixed}
     thead th{
-      background:#f6f7fb;color:#111827;font-weight:700;font-size:12.5px;padding:10px 8px;border-bottom:1px solid var(--line);
-      position:sticky;top:0;z-index:1;
+      background:#f6f7fb;color:#111827;font-weight:700;font-size:12.5px;padding:8px 8px;border-bottom:1px solid var(--line);
+      position:sticky;top:0;z-index:1;white-space:nowrap;
     }
-    tbody td{padding:10px 8px;border-bottom:1px solid var(--line);font-size:13.5px}
+    tbody td{
+      padding:8px 8px;border-bottom:1px solid var(--line);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
     tbody tr:nth-child(even){background:#fafbff}
     td.left{text-align:left}
+    .nameCell{max-width:280px} /* 긴 이름도 한 줄로 깔끔히 */
     .qtyCtl{display:inline-flex;align-items:center;gap:8px}
     .btn-sm{
       width:28px;height:28px;border:1px solid var(--line);background:#f3f5fa;border-radius:8px;cursor:pointer;font-weight:800;
@@ -88,10 +91,10 @@
     }
     .del{border:none;background:transparent;color:#ef4444;cursor:pointer;font-size:18px;line-height:1}
 
-    .totals{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+    .totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}
     .totalLine{display:flex;justify-content:space-between;align-items:center}
     .gift{font-weight:800}
-    .actions{margin-top:12px;display:flex;gap:8px}
+    .actions{margin-top:10px;display:flex;gap:8px}
     .pay{
       flex:1;background:var(--accent);border:1px solid var(--accent);color:var(--accent-ink);
       border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;font-size:15px;letter-spacing:-0.2px;
@@ -99,7 +102,6 @@
     .pay:active{transform:translateY(1px)}
     .note{font-size:12px;color:var(--muted);margin-top:6px}
 
-    /* 접근성 & 모션 */
     :focus-visible{outline:2px solid #94a3b8;outline-offset:2px;border-radius:10px}
     @media (prefers-reduced-motion:reduce){
       .product,.btn,.btn-sm,.pay{transition:none}
@@ -110,7 +112,7 @@
   <div class="page">
     <header>
       <h1>유아른 계산기</h1>
-      <div class="hint">패드 가로 기준 최적화. 결제 시 폼 전송 후 자동 초기화됩니다.</div>
+      <div class="hint">패드 가로 기준. 결제 시 폼 전송 후 자동 초기화.</div>
     </header>
 
     <main id="left">
@@ -123,7 +125,13 @@
       <div id="cartWrap" style="display:none">
         <table id="cartTable" aria-label="선택 상품 목록">
           <thead>
-            <tr><th style="width:45%">상품명</th><th style="width:18%">수량</th><th style="width:18%">단가</th><th style="width:18%">금액</th><th style="width:1%"></th></tr>
+            <tr>
+              <th style="width:44%">상품명</th>
+              <th style="width:18%">수량</th>
+              <th style="width:18%">단가</th>
+              <th style="width:18%">금액</th>
+              <th style="width:2%"></th>
+            </tr>
           </thead>
           <tbody id="cartBody"></tbody>
         </table>
@@ -144,7 +152,8 @@
   <iframe name="hiddenFrame" style="display:none"></iframe>
 
   <script>
-    /* 이미지가 필요한 일부 품목만 연결 (파일은 나중에 넣기) */
+    /* 이미지 파일 경로 (모든 카드가 이미지 전제로 렌더링됨) */
+    const IMG_BASE = "/img"; // 필요 시 수정
     const imageMap = {
       "혈색 립밤 4.1g": "lipbalm_blood.webp",
       "촉촉 플럼핑 립밤 4.1g": "lipbalm_plump.webp",
@@ -152,205 +161,27 @@
       "드라이 샴푸 앰플 40ml": "dry_shampoo_amp.webp",
       "아하파하 앰플 55ml": "ampoule_aha.webp",
       "수분 앰플 크림 55ml": "cream_moist.webp",
-      "동백 오일 세럼 미스트 100ml": "mist_camellia.webp"
+      "동백 오일 세럼 미스트 100ml": "mist_camellia.webp",
+      "기초 4종 트래블키트": "travel_kit.webp",
+      "올인원 로션 110ml": "all_in_one_lotion.webp",
+      "사철쑥 추출물 에센스 200ml": "mugwort_essence.webp",
+      "티트리 시카 모공팩 100g": "pore_pack.webp",
+      "약알칼리성 콩클렌징 120ml": "bean_cleansing.webp",
+      "알로에 다시마 마스크팩 27ml 8매": "aloe_mask.webp",
+      "나이트 베리어 크림 60ml": "night_barrier_cream.webp",
+      "마일드 에어핏 선세럼 50ml": "sun_serum.webp",
+      "DIY 수제비 토너 패드 60매": "toner_pad.webp",
+      "화산석 오일 컨트롤 롤러": "oil_roller.webp",
+      "시아버터 인텐시브 핸드크림 100ml": "hand_cream.webp",
+      "바디 워시 300ml": "body_wash.webp",
+      "바디 로션 300ml": "body_lotion.webp",
+      "바디 케어 세트 300ml": "body_set.webp"
     };
-    const IMG_BASE = "/img"; // 필요시 변경
+    const defaultImg = "default.webp"; // 매핑 없을 때 사용
 
+    /* 스킨케어: 트래블키트 ↔ 립밤 위치 교체 반영 */
     const categories = [
       { name:"스킨케어", items:[
         {name:"올인원 로션 110ml", price:26000},
         {name:"사철쑥 추출물 에센스 200ml", price:24000},
-        {name:"아하파하 앰플 55ml", price:29000},
-        {name:"수분 앰플 크림 55ml", price:22000},
-        {name:"티트리 시카 모공팩 100g", price:19000},
-        {name:"약알칼리성 콩클렌징 120ml", price:16000},
-        {name:"동백 오일 세럼 미스트 100ml", price:21000},
-        {name:"알로에 다시마 마스크팩 27ml 8매", price:19000},
-        {name:"나이트 베리어 크림 60ml", price:25000},
-        {name:"마일드 에어핏 선세럼 50ml", price:19000},
-        {name:"드라이 샴푸 앰플 40ml", price:13000},
-        {name:"혈색 립밤 4.1g", price:10000},
-        {name:"촉촉 플럼핑 립밤 4.1g", price:10000},
-        {name:"촉촉촉 립밤 4.1g", price:10000},
-        {name:"기초 4종 트래블키트", price:19000},
-      ]},
-      { name:"미용소품", items:[
-        {name:"DIY 수제비 토너 패드 60매", price:6500},
-        {name:"화산석 오일 컨트롤 롤러", price:9500},
-      ]},
-      { name:"바디케어", items:[
-        {name:"시아버터 인텐시브 핸드크림 100ml", price:16000},
-        {name:"바디 워시 300ml", price:22000},
-        {name:"바디 로션 300ml", price:22000},
-        {name:"바디 케어 세트 300ml", price:44000},
-      ]}
-    ];
-
-    const catsEl = document.getElementById('cats');
-    const cartEmptyEl = document.getElementById('cartEmpty');
-    const cartWrapEl = document.getElementById('cartWrap');
-    const cartBodyEl = document.getElementById('cartBody');
-    const grandEl = document.getElementById('grand');
-    const giftEl = document.getElementById('gift');
-    const payBtn = document.getElementById('pay');
-    const form = document.getElementById('orderForm');
-
-    const cart = {};       // key -> qty
-    const productMap = {}; // key -> {name, price}
-
-    // 카테고리 및 카드 렌더
-    categories.forEach((cat, ci)=>{
-      const sec = document.createElement('section');
-      sec.className = 'cat';
-      sec.innerHTML = `<h3>${cat.name}</h3><div class="grid"></div>`;
-      const grid = sec.querySelector('.grid');
-
-      cat.items.forEach((p, pi)=>{
-        const key = `${ci}-${pi}`;
-        productMap[key] = p;
-
-        const card = document.createElement('div');
-        card.className = 'product';
-
-        const hasImg = imageMap[p.name];
-        const imgHTML = hasImg ? `<img class="p-thumb" loading="lazy" alt="${p.name}" src="${IMG_BASE}/${imageMap[p.name]}">` : '';
-        card.innerHTML = `
-          ${imgHTML}
-          <div class="p-name">${p.name}</div>
-          <div class="p-price">${p.price.toLocaleString()}원</div>
-          <div class="qtyRow" role="group" aria-label="${p.name} 수량 조절">
-            <button class="btn" data-act="minus" aria-label="${p.name} 수량 감소">−</button>
-            <div class="badge" id="badge-${key}" aria-live="polite">0</div>
-            <button class="btn" data-act="plus" aria-label="${p.name} 수량 증가">＋</button>
-          </div>
-        `;
-
-        card.addEventListener('click',(e)=>{
-          const act = e.target?.dataset?.act;
-          if (act === 'minus') {
-            if ((cart[key]||0) > 0) cart[key]--;
-            if (cart[key] === 0) delete cart[key];
-          } else { // plus 또는 카드 클릭
-            cart[key] = (cart[key]||0) + 1;
-          }
-          render();
-        });
-        grid.appendChild(card);
-      });
-
-      catsEl.appendChild(sec);
-    });
-
-    function currentGift(total){
-      if (total >= 100000) return "마스크팩 + 립밤 중 택1 + 리사이클파우치";
-      if (total >= 50000)  return "마스크팩 + 립밤 중 택1";
-      if (total >= 30000)  return "마스크팩";
-      return "없음";
-    }
-
-    function render(){
-      // 배지 업데이트
-      Object.keys(productMap).forEach(key=>{
-        const b = document.getElementById(`badge-${key}`);
-        if (b) b.textContent = String(cart[key]||0);
-      });
-
-      const keys = Object.keys(cart);
-      if (keys.length === 0){
-        cartEmptyEl.style.display = '';
-        cartWrapEl.style.display = 'none';
-        grandEl.textContent = '0원';
-        giftEl.textContent = '없음';
-        return;
-      }
-      cartEmptyEl.style.display = 'none';
-      cartWrapEl.style.display = '';
-
-      // 테이블 업데이트
-      let total = 0;
-      cartBodyEl.innerHTML = keys.map(key=>{
-        const p = productMap[key], q = cart[key], sub = q * p.price;
-        total += sub;
-        return `
-          <tr data-key="${key}">
-            <td class="left">${p.name}</td>
-            <td>
-              <div class="qtyCtl">
-                <button class="btn-sm" data-act="minus" aria-label="${p.name} 수량 감소">−</button>
-                <span aria-live="polite">${q}</span>
-                <button class="btn-sm" data-act="plus" aria-label="${p.name} 수량 증가">＋</button>
-              </div>
-            </td>
-            <td>${p.price.toLocaleString()}원</td>
-            <td>${sub.toLocaleString()}원</td>
-            <td><button class="del" title="삭제" data-act="del" aria-label="${p.name} 삭제">✕</button></td>
-          </tr>`;
-      }).join('');
-
-      grandEl.textContent = `${total.toLocaleString()}원`;
-      giftEl.textContent = currentGift(total);
-    }
-
-    // 테이블 내 수량/삭제 조작
-    cartBodyEl.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button');
-      if(!btn) return;
-      const tr = e.target.closest('tr');
-      const key = tr?.dataset?.key;
-      if(!key) return;
-
-      const act = btn.dataset.act;
-      if (act === 'plus') cart[key] = (cart[key]||0) + 1;
-      else if (act === 'minus') {
-        if ((cart[key]||0) > 0) cart[key]--;
-        if (cart[key] === 0) delete cart[key];
-      } else if (act === 'del') {
-        delete cart[key];
-      }
-      render();
-    });
-
-    // 결제 → Google Form 전송 → 초기화
-    payBtn.addEventListener('click', ()=>{
-      const keys = Object.keys(cart);
-      if (keys.length === 0){ alert('상품을 선택하세요.'); return; }
-
-      form.innerHTML = '';
-
-      // 각 품목 name/qty/price 전송 (entry.* 는 본인 폼의 entry ID로 교체)
-      keys.forEach(key=>{
-        const p = productMap[key], q = cart[key];
-
-        const in1 = document.createElement('input');
-        in1.type='hidden'; in1.name='entry.ITEM_NAME'; in1.value=p.name; form.appendChild(in1);
-
-        const in2 = document.createElement('input');
-        in2.type='hidden'; in2.name='entry.ITEM_QTY'; in2.value=String(q); form.appendChild(in2);
-
-        const in3 = document.createElement('input');
-        in3.type='hidden'; in3.name='entry.ITEM_PRICE'; in3.value=String(p.price); form.appendChild(in3);
-      });
-
-      // 총합/사은품/시간
-      const totalVal = document.getElementById('grand').textContent.replace(/[^0-9]/g,'') || '0';
-      const inTotal = document.createElement('input');
-      inTotal.type='hidden'; inTotal.name='entry.TOTAL'; inTotal.value=totalVal; form.appendChild(inTotal);
-
-      const inGift = document.createElement('input');
-      inGift.type='hidden'; inGift.name='entry.GIFT'; inGift.value=document.getElementById('gift').textContent; form.appendChild(inGift);
-
-      const inTime = document.createElement('input');
-      inTime.type='hidden'; inTime.name='entry.TIMESTAMP'; inTime.value=(new Date()).toISOString(); form.appendChild(inTime);
-
-      form.submit();
-
-      // 초기화
-      for (const k of Object.keys(cart)) delete cart[k];
-      render();
-      window.scrollTo({top:0,behavior:'smooth'});
-    });
-
-    render();
-  </script>
-</body>
-</html>
+        {name:"아하파하 앰플 55ml", pr
