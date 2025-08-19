@@ -8,18 +8,17 @@
     body {
       font-family: sans-serif;
       padding: 20px;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
     }
-    h2 {
-      text-align: center;
-    }
+    h2 { text-align: center; }
     .item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
+    .item span { flex: 1; }
     .item input {
       width: 60px;
       text-align: center;
@@ -40,23 +39,53 @@
 </head>
 <body>
   <h2>유아른 계산기</h2>
-  <div class="item"><span>올인원 로션 (26,600)</span><input type="number" min="0" step="1" value="" data-price="26600"></div>
-  <div class="item"><span>나이트 베리어 크림 (25,200)</span><input type="number" min="0" step="1" value="" data-price="25200"></div>
-  <div class="item"><span>아하파하 앰플 (29,400)</span><input type="number" min="0" step="1" value="" data-price="29400"></div>
-  <div class="item"><span>수분 앰플 크림 (22,400)</span><input type="number" min="0" step="1" value="" data-price="22400"></div>
-  <div class="item"><span>사철쑥 에센스 (24,500)</span><input type="number" min="0" step="1" value="" data-price="24500"></div>
-  <div class="item"><span>드라이 샴푸 앰플 (14,400)</span><input type="number" min="0" step="1" value="" data-price="14400"></div>
-  <div class="item"><span>비건 바디 세트 (44,800)</span><input type="number" min="0" step="1" value="" data-price="44800"></div>
+  <div id="productList"></div>
 
   <button id="reset">초기화</button>
   <div id="total">총합: 0원</div>
   <div id="gift">사은품: 없음</div>
 
   <script>
-    const inputs = document.querySelectorAll('input');
-    const totalEl = document.getElementById('total');
-    const giftEl = document.getElementById('gift');
-    const resetBtn = document.getElementById('reset');
+    // === 상품 배열 ===
+    const products = [
+      { name: "DIY 수제비 토너 패드 60매", price: 6500 },
+      { name: "화산석 오일 컨트롤 롤러", price: 9500 },
+      { name: "혈색 립밤 4.1g", price: 10000 },
+      { name: "촉촉 플럼핑 립밤 4.1g", price: 10000 },
+      { name: "촉촉촉 립밤 4.1g", price: 10000 },
+      { name: "드라이 샴푸 앰플 40ml", price: 13000 },
+      { name: "약알칼리성 콩클렌징 120ml", price: 16000 },
+      { name: "시아버터 인텐시브 핸드크림 100ml", price: 16000 },
+      { name: "마일드 에어핏 선세럼 50ml", price: 19000 },
+      { name: "티트리 시카 모공팩 100g", price: 19000 },
+      { name: "기초 4종 트래블키트", price: 19000 },
+      { name: "알로에 다시마 마스크팩 27ml 8매", price: 19000 },
+      { name: "동백 오일 세럼 미스트 100ml", price: 21000 },
+      { name: "수분 앰플 크림 55ml", price: 22000 },
+      { name: "바디 워시 300ml", price: 22000 },
+      { name: "바디 로션 300ml", price: 22000 },
+      { name: "사철쑥 추출물 에센스 200ml", price: 24000 },
+      { name: "나이트 베리어 크림 60ml", price: 25000 },
+      { name: "올인원 로션 110ml", price: 26000 },
+      { name: "아하파하 앰플 55ml", price: 29000 },
+      { name: "바디 케어 세트 300ml (워시+로션+샤워 타월)", price: 44000 },
+    ];
+
+    const productList = document.getElementById("productList");
+    const totalEl = document.getElementById("total");
+    const giftEl = document.getElementById("gift");
+    const resetBtn = document.getElementById("reset");
+
+    // 상품 DOM 자동 생성
+    products.forEach((p) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `<span>${p.name} (${p.price.toLocaleString()}원)</span>
+        <input type="number" min="0" step="1" value="" data-price="${p.price}">`;
+      productList.appendChild(div);
+    });
+
+    const inputs = document.querySelectorAll("#productList input");
 
     function updateTotal() {
       let total = 0;
@@ -68,25 +97,3 @@
       totalEl.textContent = `총합: ${total.toLocaleString()}원`;
 
       // 사은품 조건
-      let gift = "사은품: 없음";
-      if (total >= 100000) {
-        gift = "사은품: 마스크팩 + 립밤 중 택1 + 리사이클파우치";
-      } else if (total >= 50000) {
-        gift = "사은품: 마스크팩 + 립밤 중 택1";
-      } else if (total >= 30000) {
-        gift = "사은품: 마스크팩";
-      }
-      giftEl.textContent = gift;
-    }
-
-    inputs.forEach(input => {
-      input.addEventListener('input', updateTotal);
-    });
-
-    resetBtn.addEventListener('click', () => {
-      inputs.forEach(input => input.value = "");
-      updateTotal();
-    });
-  </script>
-</body>
-</html>
