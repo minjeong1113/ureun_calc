@@ -19,7 +19,8 @@
       font:14.5px/1.55 Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     }
 
-    .page{max-width:2360px;margin:8px auto;padding:0 14px;display:grid;grid-template-columns:3fr 2fr;gap:20px;min-height:calc(100dvh - 16px);}
+    .page{max-width:2360px;margin:8px auto;padding:0 14px;
+      display:grid;grid-template-columns:3fr 2fr;gap:20px;min-height:calc(100dvh - 16px);}
     header{grid-column:1/-1;margin:0 0 6px}
     h1{margin:0;font-size:18px;font-weight:800;}
 
@@ -33,19 +34,23 @@
     .product{
       background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
       padding:10px;box-shadow:var(--shadow);
-      display:flex;align-items:center;gap:10px;cursor:pointer;
-      transition:0.2s;
+      display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:0.2s;
     }
     .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
+    .topRow{display:flex;align-items:center;gap:10px;}
     .p-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#eef2f7;}
     .p-info{flex:1;display:flex;flex-direction:column;gap:2px;}
     .p-name{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .p-price{font-size:12.5px;color:var(--muted);}
-    .qtyRow{display:flex;align-items:center;gap:6px;}
-    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;}
+    .qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;}
+    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
+      width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
+      display:flex;align-items:center;justify-content:center;}
     .badge{min-width:34px;text-align:center;font-weight:800;}
 
-    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);max-height:calc(100dvh - 20px);overflow:auto;min-width:560px;}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
+      padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
+      max-height:calc(100dvh - 20px);overflow:auto;min-width:560px;}
     .panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
     .empty{padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:#6b7280;background:#fafbff}
     table{width:100%;border-collapse:separate;border-spacing:0;margin-top:6px;border-radius:12px;border:1px solid var(--line);table-layout:fixed}
@@ -181,13 +186,16 @@
           const src=p.img.startsWith("http")?p.img:`${IMG_BASE}/${p.img}`;
           const card=document.createElement('div'); card.className='product'; card.id=`card-${key}`;
           card.innerHTML=`
-            <img class="p-thumb" alt="${p.name}" src="${src}">
-            <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${p.price.toLocaleString()}원</div></div>
+            <div class="topRow">
+              <img class="p-thumb" alt="${p.name}" src="${src}">
+              <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${p.price.toLocaleString()}원</div></div>
+            </div>
             <div class="qtyRow"><button class="btn" data-act="minus">−</button><div class="badge" id="badge-${key}">0</div><button class="btn" data-act="plus">＋</button></div>`;
           card.addEventListener('click',(e)=>{
             const act=e.target?.dataset?.act;
             if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
             else if(act==='plus'){ cart[key]=(cart[key]||0)+1; }
+            else { cart[key]=(cart[key]||0)+1; } // 카드 아무 곳 클릭 시 +1
             render();
           });
           grid.appendChild(card);
