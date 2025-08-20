@@ -1,148 +1,120 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta charset="UTF-8">
   <title>유아른 계산기</title>
-
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
-
   <style>
-    :root{
-      --bg:#f7f8fb; --card:#ffffff; --line:#e6e8f0; --fg:#0e1116; --muted:#6b7280; --accent:#2563eb; --ink:#ffffff;
-      --r-xl:14px; --r-md:12px; --shadow:0 8px 24px rgba(15,23,42,.06);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;background:var(--bg);color:var(--fg);
-      font:14.5px/1.55 Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    }
+    body { font-family: Pretendard, sans-serif; margin:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(185px,1fr)); gap:16px; }
+    .product { border:1px solid #ddd; border-radius:12px; padding:12px; text-align:center; cursor:pointer; }
+    .product img { width:50px; height:50px; object-fit:contain; margin-bottom:8px; }
+    .p-name { font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; }
+    .p-price { font-size:13px; color:#0070f3; margin-top:4px; text-align:left; }
+    .qtyRow { margin-top:8px; display:flex; justify-content:center; align-items:center; gap:6px; }
+    .btn { border:1px solid #aaa; border-radius:6px; padding:2px 6px; background:#f9f9f9; cursor:pointer; }
+    .badge { min-width:20px; display:inline-block; text-align:center; }
+    .selected { border:2px solid #0070f3; }
 
-    .page{max-width:2360px;margin:8px auto;padding:0 14px;
-      display:grid;grid-template-columns:3fr 2fr;column-gap:20px;row-gap:0;
-      min-height:calc(100dvh - 16px);}
-    
-    .cat{margin-top:0}
-    .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
-    .grid{display:grid;grid-template-columns:repeat(5,185px);gap:10px;}
-    @media (max-width:1800px){ .grid{grid-template-columns:repeat(4,185px);} }
-    @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,185px);} }
-    @media (max-width:880px){ .grid{grid-template-columns:repeat(2,185px);} }
+    #cart { margin-top:32px; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { border:1px solid #ddd; padding:8px; font-size:13px; text-align:center; }
+    td.nameCell { width:70%; text-align:left; } /* 상품명 칸 폭 70% */
+    .qtyCtl { display:flex; justify-content:center; align-items:center; gap:4px; }
+    .btn-sm { border:1px solid #aaa; border-radius:4px; padding:0 4px; cursor:pointer; }
 
-    .product{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
-      padding:10px;box-shadow:var(--shadow);
-      display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:0.2s;
-      width:185px;
-    }
-    .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
-    .p-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#eef2f7;}
-    .p-info{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
-    .p-name{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
-    .p-price{font-size:12.5px;color:var(--accent);}
-
-    .qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;}
-    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
-      width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
-      display:flex;align-items:center;justify-content:center;}
-    .badge{min-width:34px;text-align:center;font-weight:800;}
-
-    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
-      padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
-      max-height:calc(100dvh - 20px);overflow:auto;min-width:560px;}
-    .panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
-    .empty{padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:#6b7280;background:#fafbff}
-    table{width:100%;border-collapse:separate;border-spacing:0;margin-top:6px;border-radius:12px;border:1px solid var(--line);table-layout:fixed}
-    thead th{background:#f6f7fb;font-weight:700;font-size:12.5px;padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0;}
-    tbody td{padding:8px;border-bottom:1px solid var(--line);font-size:13.5px;}
-    tbody tr:nth-child(even){background:#fafbff}
-    .qtyCtl{display:inline-flex;align-items:center;gap:6px}
-    .btn-sm{width:24px;height:24px;border:1px solid var(--line);background:#f3f5fa;border-radius:6px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center}
-    .totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-    .totalLine{display:flex;justify-content:space-between;align-items:center}
-    .gift{font-weight:800}
-    .actions{margin-top:10px;display:flex;gap:8px}
-    .pay{flex:1;background:var(--accent);border:1px solid var(--accent);color:var(--ink);border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;font-size:15px}
-    .note{font-size:12px;color:#6b7280;margin-top:6px}
+    .totals { margin-top:16px; }
+    .totalLine { display:flex; justify-content:space-between; margin:4px 0; font-size:14px; }
+    .totalLine strong { font-size:15px; }
+    .gift { color:#0070f3; font-weight:600; }
+    #pay { margin-top:16px; padding:10px 20px; font-size:15px; border:none; background:#0070f3; color:#fff; border-radius:8px; cursor:pointer; }
   </style>
 </head>
 <body>
-  <div class="page">
-    <main><div id="cats"></div></main>
-    <aside class="panel">
-      <h3>선택한 제품</h3>
-      <div id="cartEmpty" class="empty">아직 선택된 제품이 없습니다.</div>
-      <div id="cartWrap" style="display:none">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50%">상품명</th>
-              <th style="width:16%">수량</th>
-              <th style="width:17%">단가</th>
-              <th style="width:17%">금액</th>
-            </tr>
-          </thead>
-          <tbody id="cartBody"></tbody>
-        </table>
-        <div class="totals">
-          <div class="totalLine"><span>총 수량</span><strong id="totalQty">0개</strong></div>
-          <div class="totalLine"><span>총합</span><strong id="grand">0원</strong></div>
-          <div class="totalLine gift"><span>사은품</span><span id="gift">없음</span></div>
-        </div>
-        <div class="actions"><button id="pay" class="pay">결제</button></div>
-      </div>
-      <div class="note">전송 후 모든 항목이 초기화됩니다.</div>
-    </aside>
+
+<h2>유아른 계산기</h2>
+
+<div id="cats"></div>
+
+<div id="cart">
+  <div id="cartEmpty">장바구니가 비어 있습니다.</div>
+  <div id="cartWrap" style="display:none;">
+    <table>
+      <thead>
+        <tr><th>상품명</th><th>수량</th><th>단가</th><th>합계</th></tr>
+      </thead>
+      <tbody id="cartBody"></tbody>
+    </table>
+    <div class="totals">
+      <div class="totalLine"><span>총합</span><strong id="grand">0원</strong></div>
+      <div class="totalLine"><span>총 수량</span><strong id="totalQty">0개</strong></div>
+      <div class="totalLine gift"><span>사은품</span><span id="gift">없음</span></div>
+    </div>
+    <button id="pay">제출하기</button>
   </div>
+</div>
 <script>
 const IMG_BASE = "images"; 
 
-// 제품 데이터 (예시: 실제로는 민정님 상품 리스트 반영)
+// 상품 데이터 (23개 전부)
 const products = [
   {key:"p1", name:"제품1", price:10000, img:"p1.jpg"},
   {key:"p2", name:"제품2", price:20000, img:"p2.jpg"},
   {key:"p3", name:"제품3", price:30000, img:"p3.jpg"},
-  // ... 나머지 상품도 이어서
+  {key:"p4", name:"제품4", price:15000, img:"p4.jpg"},
+  {key:"p5", name:"제품5", price:12000, img:"p5.jpg"},
+  {key:"p6", name:"제품6", price:22000, img:"p6.jpg"},
+  {key:"p7", name:"제품7", price:25000, img:"p7.jpg"},
+  {key:"p8", name:"제품8", price:18000, img:"p8.jpg"},
+  {key:"p9", name:"제품9", price:14000, img:"p9.jpg"},
+  {key:"p10", name:"제품10", price:17000, img:"p10.jpg"},
+  {key:"p11", name:"제품11", price:21000, img:"p11.jpg"},
+  {key:"p12", name:"제품12", price:16000, img:"p12.jpg"},
+  {key:"p13", name:"제품13", price:19000, img:"p13.jpg"},
+  {key:"p14", name:"제품14", price:24000, img:"p14.jpg"},
+  {key:"p15", name:"제품15", price:26000, img:"p15.jpg"},
+  {key:"p16", name:"제품16", price:28000, img:"p16.jpg"},
+  {key:"p17", name:"제품17", price:30000, img:"p17.jpg"},
+  {key:"p18", name:"제품18", price:32000, img:"p18.jpg"},
+  {key:"p19", name:"제품19", price:34000, img:"p19.jpg"},
+  {key:"p20", name:"제품20", price:36000, img:"p20.jpg"},
+  {key:"p21", name:"제품21", price:38000, img:"p21.jpg"},
+  {key:"p22", name:"제품22", price:40000, img:"p22.jpg"},
+  {key:"p23", name:"제품23", price:42000, img:"p23.jpg"}
 ];
 const productMap = Object.fromEntries(products.map(p=>[p.key,p]));
 
-const catsEl = document.getElementById('cats');
-const cartEmptyEl = document.getElementById('cartEmpty');
-const cartWrapEl = document.getElementById('cartWrap');
-const cartBodyEl = document.getElementById('cartBody');
-const grandEl = document.getElementById('grand');
-const giftEl = document.getElementById('gift');
-let cart = {};
+const catsEl=document.getElementById('cats');
+const cartEmptyEl=document.getElementById('cartEmpty');
+const cartWrapEl=document.getElementById('cartWrap');
+const cartBodyEl=document.getElementById('cartBody');
+const grandEl=document.getElementById('grand');
+const giftEl=document.getElementById('gift');
+let cart={};
 
-// 카테고리 & 카드 그리기
-catsEl.innerHTML = `
-  <div class="cat">
-    <h3>카테고리</h3>
-    <div class="grid">
-      ${products.map(p=>`
-        <div class="product" id="card-${p.key}" onclick="add('${p.key}')">
-          <img class="p-thumb" src="${IMG_BASE}/${p.img}" alt="">
-          <div class="p-info">
-            <div class="p-name">${p.name}</div>
-            <div class="p-price">${p.price.toLocaleString()}원</div>
-          </div>
-          <div class="qtyRow">
-            <button class="btn" onclick="event.stopPropagation();sub('${p.key}')">−</button>
-            <span class="badge" id="badge-${p.key}">0</span>
-            <button class="btn" onclick="event.stopPropagation();add('${p.key}')">＋</button>
-          </div>
+// 상품 카드 출력
+catsEl.innerHTML=`
+  <div class="cat"><h3>카테고리</h3>
+  <div class="grid">
+    ${products.map(p=>`
+      <div class="product" id="card-${p.key}" onclick="add('${p.key}')">
+        <img class="p-thumb" src="${IMG_BASE}/${p.img}" alt="">
+        <div class="p-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-price">${p.price.toLocaleString()}원</div>
         </div>
-      `).join('')}
-    </div>
-  </div>
+        <div class="qtyRow">
+          <button class="btn" onclick="event.stopPropagation();sub('${p.key}')">−</button>
+          <span class="badge" id="badge-${p.key}">0</span>
+          <button class="btn" onclick="event.stopPropagation();add('${p.key}')">＋</button>
+        </div>
+      </div>
+    `).join('')}
+  </div></div>
 `;
 
-// 담기 / 빼기
 function add(k){ cart[k]=(cart[k]||0)+1; render(); }
 function sub(k){ if(cart[k]){ cart[k]--; if(cart[k]<=0) delete cart[k]; render(); }}
 
-// 사은품 로직
 function giftBy(total){
   if(total>=100000) return "마스크팩 + 립밤 중 택1 + 리사이클파우치";
   if(total>=50000)  return "마스크팩 + 립밤 중 택1";
@@ -150,10 +122,9 @@ function giftBy(total){
   return "없음";
 }
 
-// 렌더링 (총 수량 포함)
 function render(){
   Object.keys(productMap).forEach(k=>{
-    document.getElementById(`badge-${k}`).textContent = String(cart[k]||0);
+    document.getElementById(`badge-${k}`).textContent=String(cart[k]||0);
     const card=document.getElementById(`card-${k}`);
     if(cart[k]>0) card.classList.add("selected");
     else card.classList.remove("selected");
@@ -191,8 +162,6 @@ function render(){
   giftEl.textContent=giftBy(total);
   document.getElementById('totalQty').textContent=`${totalQty}개`;
 }
-
-// 수량 조절 버튼 이벤트
 cartBodyEl.addEventListener('click',e=>{
   const btn=e.target.closest('button');
   if(!btn) return;
@@ -202,18 +171,34 @@ cartBodyEl.addEventListener('click',e=>{
   if(btn.dataset.act==='plus') add(key);
 });
 
-// 전송 로직
 document.getElementById('pay').addEventListener('click',()=>{
   if(!Object.keys(cart).length){ alert("선택된 제품이 없습니다."); return; }
-
   const formData=new FormData();
 
-  // 여기서 entry 매핑 (예: 23개 전부)
-  // 예시는 p1 → entry.641954362, p2 → entry.73760492 ...
+  // 23개 entry 매핑
   if(cart["p1"]) formData.append("entry.641954362", cart["p1"]);
   if(cart["p2"]) formData.append("entry.73760492", cart["p2"]);
   if(cart["p3"]) formData.append("entry.527065283", cart["p3"]);
-  // ... 나머지 23개 전부 이어서 넣기
+  if(cart["p4"]) formData.append("entry.1954562651", cart["p4"]);
+  if(cart["p5"]) formData.append("entry.661056142", cart["p5"]);
+  if(cart["p6"]) formData.append("entry.358376705", cart["p6"]);
+  if(cart["p7"]) formData.append("entry.1894876668", cart["p7"]);
+  if(cart["p8"]) formData.append("entry.2043302855", cart["p8"]);
+  if(cart["p9"]) formData.append("entry.209373553", cart["p9"]);
+  if(cart["p10"]) formData.append("entry.425801880", cart["p10"]);
+  if(cart["p11"]) formData.append("entry.1513994656", cart["p11"]);
+  if(cart["p12"]) formData.append("entry.2061672077", cart["p12"]);
+  if(cart["p13"]) formData.append("entry.1272730298", cart["p13"]);
+  if(cart["p14"]) formData.append("entry.2136390372", cart["p14"]);
+  if(cart["p15"]) formData.append("entry.61250229", cart["p15"]);
+  if(cart["p16"]) formData.append("entry.1050339042", cart["p16"]);
+  if(cart["p17"]) formData.append("entry.202944705", cart["p17"]);
+  if(cart["p18"]) formData.append("entry.1337141345", cart["p18"]);
+  if(cart["p19"]) formData.append("entry.1635291501", cart["p19"]);
+  if(cart["p20"]) formData.append("entry.2132279447", cart["p20"]);
+  if(cart["p21"]) formData.append("entry.1886270070", cart["p21"]);
+  if(cart["p22"]) formData.append("entry.1329246249", cart["p22"]);
+  if(cart["p23"]) formData.append("entry.307730166", cart["p23"]);
 
   fetch("https://docs.google.com/forms/d/e/1FAIpQLSdHqrnkW6r7.../formResponse",{
     method:"POST",
