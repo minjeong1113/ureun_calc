@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
 
   <style>
-  :root{
+ :root{
   --bg:#f7f8fb; --card:#ffffff; --line:#e6e8f0; --fg:#0e1116; --muted:#6b7280; --accent:#2563eb; --ink:#ffffff;
   --r-xl:14px; --r-md:12px; --shadow:0 8px 24px rgba(15,23,42,.06);
 }
@@ -26,7 +26,7 @@ body{
   padding:0 14px;
   display:grid;
   grid-template-columns: 55% 45%; /* 메인 55%, 장바구니 45% */
-  column-gap:20px;
+  column-gap:12px; /* 카드 ↔ 장바구니 사이 간격 12px */
   min-height:calc(100dvh - 16px);
   overflow-x:hidden;
 }
@@ -43,7 +43,7 @@ main {
 .grid {
   display:grid;
   grid-template-columns: repeat(4, 1fr); /* 항상 4칸 */
-  gap:10px; /* 카드 간격 10px */
+  gap:10px;
   align-items: stretch;
 }
 @media (max-width:880px){
@@ -63,7 +63,7 @@ main {
   cursor:pointer;
   transition:0.2s;
   height:100%;
-  aspect-ratio:4/3; /* 가로:세로 4:3 비율 고정 */
+  aspect-ratio:5/4; /* 기존 4:3 → 5:4로 세로 줄임 */
 }
 .product.selected{
   border:2px solid var(--accent);
@@ -71,7 +71,7 @@ main {
 }
 .topRow{display:flex;align-items:center;gap:10px;}
 .p-thumb{
-  width:42px;  /* 기존 50px → 42px */
+  width:42px;
   height:42px;
   border-radius:8px;
   object-fit:cover;
@@ -98,9 +98,9 @@ main {
 
 /* 장바구니 패널 */
 .panel{
-  flex:0 0 440px;   /* 기존 500px → 440px */
-  min-width:380px;
-  max-width:500px;
+  flex:0 0 420px;   /* 기존 440px → 420px */
+  min-width:360px;
+  max-width:480px;
   background:var(--card);
   border:1px solid var(--line);
   border-radius:var(--r-xl);
