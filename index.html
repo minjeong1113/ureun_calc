@@ -26,15 +26,13 @@ body{
   padding:0 14px;
   display:grid;
   grid-template-columns: 55% 45%; /* 메인 55%, 장바구니 45% */
-  column-gap:12px; /* 카드 ↔ 장바구니 사이 간격 12px */
+  column-gap:12px;               /* 카드 ↔ 장바구니 사이 간격 12px */
   min-height:calc(100dvh - 16px);
   overflow-x:hidden;
+  align-items:start;             /* 메인과 패널 상단 기준 정렬 */
 }
 
-main {
-  margin-top:0;
-  padding-top:0;
-}
+main {margin-top:0;padding-top:0;align-self:start;}
 .cat{margin-top:0}
 .cat:first-child{margin-top:0 !important;} /* 첫 카테고리 여백 제거 */
 .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
@@ -43,7 +41,7 @@ main {
 .grid {
   display:grid;
   grid-template-columns: repeat(4, 1fr); /* 항상 4칸 */
-  gap:10px;
+  gap:10px; /* 카드 간격 */
   align-items: stretch;
 }
 @media (max-width:880px){
@@ -59,17 +57,18 @@ main {
   box-shadow:var(--shadow);
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
+  justify-content:space-between; /* 위/아래 블록 균등 분배 */
+  gap:4px;                        /* 블록 간격 줄이기 */
   cursor:pointer;
   transition:0.2s;
   height:100%;
-  aspect-ratio:5/4; /* 기존 4:3 → 5:4로 세로 줄임 */
+  aspect-ratio:5/4; /* 세로 줄인 비율 */
 }
 .product.selected{
   border:2px solid var(--accent);
   box-shadow:0 0 0 3px rgba(37,99,235,0.2);
 }
-.topRow{display:flex;align-items:center;gap:10px;}
+.topRow{display:flex;align-items:center;gap:8px;}
 .p-thumb{
   width:42px;
   height:42px;
@@ -88,7 +87,13 @@ main {
   max-width:100%;
 }
 .p-price{font-size:12.5px;color:var(--accent);}
-.qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;}
+.qtyRow{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  margin-top:2px; /* 위쪽과 최소 간격 */
+}
 .btn{
   border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
   width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
@@ -98,7 +103,7 @@ main {
 
 /* 장바구니 패널 */
 .panel{
-  flex:0 0 420px;   /* 기존 440px → 420px */
+  flex:0 0 420px;   /* 기존보다 축소 */
   min-width:360px;
   max-width:480px;
   background:var(--card);
@@ -107,7 +112,7 @@ main {
   padding:12px;
   position:sticky;
   top:0;
-  align-self:start;
+  align-self:start; /* 메인과 같은 baseline */
   box-shadow:var(--shadow);
   max-height:calc(100dvh - 20px);
   overflow:auto;
@@ -115,49 +120,8 @@ main {
 .panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
 .empty{
   padding:14px;border:1px dashed var(--line);border-radius:12px;
-  text-align:center;color:#6b7280;background:#fafbff
-}
-table{
-  width:100%;border-collapse:separate;border-spacing:0;
-  margin-top:6px;border-radius:12px;border:1px solid var(--line);
-  table-layout:fixed
-}
-/* 장바구니 표 열 폭 조정 */
-table colgroup col:first-child {
-  width:120px !important; /* 상품명 칸 좁힘 */
-}
-thead th{
-  background:#f6f7fb;font-weight:700;font-size:12.5px;
-  padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0;
-}
-tbody td{padding:8px;border-bottom:1px solid var(--line);font-size:13.5px;}
-tbody tr:nth-child(even){background:#fafbff}
-.nameCell {
-  width:100px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-td.priceCell,
-td.subtotalCell {
-  text-align: center;
-}
-.qtyCtl{display:inline-flex;align-items:center;gap:6px}
-.btn-sm{
-  width:24px;height:24px;border:1px solid var(--line);background:#f3f5fa;
-  border-radius:6px;cursor:pointer;font-weight:800;
-  display:flex;align-items:center;justify-content:center
-}
-.totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-.totalLine{display:flex;justify-content:space-between;align-items:center}
-.gift{font-weight:800}
-.actions{margin-top:10px;display:flex;gap:8px}
-.pay{
-  flex:1;background:var(--accent);border:1px solid var(--accent);color:var(--ink);
-  border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;font-size:15px
-}
-.note{font-size:12px;color:#6b7280;margin-top:6px}
-
+  text-align:center;color:#6b7280;ba
+  
   </style>
 </head>
 <body>
