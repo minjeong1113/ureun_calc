@@ -85,16 +85,22 @@ td.subtotalCell {
       <div id="cartEmpty" class="empty">아직 선택된 제품이 없습니다.</div>
       <div id="cartWrap" style="display:none">
         <table>
-          <thead>
-            <tr>
-              <th style="width:180px">상품명</th>
-              <th style="width:30px">수량</th>
-              <th style="width:50px">단가</th>
-              <th style="width:50px">금액</th>
-            </tr>
-          </thead>
-          <tbody id="cartBody"></tbody>
-        </table>
+          <colgroup>
+          <col style="width:180px"> <!-- 상품명 -->
+          <col style="width:80px">  <!-- 수량 -->
+          <col style="width:100px"> <!-- 단가 -->
+          <col style="width:100px"> <!-- 금액 -->
+        </colgroup>
+        <thead>
+          <tr>
+            <th>상품명</th>
+            <th>수량</th>
+            <th>단가</th>
+            <th>금액</th>
+          </tr>
+        </thead>
+        <tbody id="cartBody"></tbody>
+      </table>
         <div class="totals">
           <div class="totalLine"><span>총합</span><strong id="grand">0원</strong></div>
           <div class="totalLine"><span>총 수량</span><strong id="totalQty">0개</strong></div>
