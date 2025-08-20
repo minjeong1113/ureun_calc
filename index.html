@@ -33,29 +33,28 @@
     .product{
       background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
       padding:10px;box-shadow:var(--shadow);
-      display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:0.2s;
+      display:flex;flex-direction:row;gap:8px;align-items:center;
+      cursor:pointer;transition:0.2s;
     }
     .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
     
-    /* 카드 상단 행: 이미지 + 가격 + +버튼 */
-    .cardTop{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-    .p-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;background:#eef2f7;}
-    .p-price{font-size:14px;font-weight:700;flex:1;text-align:center;}
-    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
-      width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
-      display:flex;align-items:center;justify-content:center;}
+    .p-thumb{width:50px;height:50px;max-width:50px;max-height:50px;border-radius:6px;object-fit:cover;background:#eef2f7;}
     
-    /* 중간 수량 표시 원형 */
+    .p-info{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:4px;}
+    .p-price{font-size:14px;font-weight:700;color:var(--accent);}
+    .p-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    
+    /* 오른쪽 버튼 세로 정렬 */
+    .qtyCol{display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
+      width:32px;height:32px;cursor:pointer;font-weight:800;font-size:16px;
+      display:flex;align-items:center;justify-content:center;}
     .badgeCircle{
-      width:28px;height:28px;border-radius:50%;
+      width:32px;height:32px;border-radius:50%;
       border:1px solid var(--line);
       display:flex;align-items:center;justify-content:center;
-      font-weight:700;margin:6px auto;
+      font-weight:700;
     }
-    
-    /* 하단: 제품명 + -버튼 */
-    .cardBottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-    .p-name{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     
     .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
       padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
@@ -206,14 +205,14 @@
           const src=p.img.startsWith("http")?p.img:`${IMG_BASE}/${p.img}`;
           const card=document.createElement('div'); card.className='product'; card.id=`card-${key}`;
           card.innerHTML=`
-            <div class="cardTop">
-              <img class="p-thumb" alt="${p.name}" src="${src}">
+            <img class="p-thumb" alt="${p.name}" src="${src}">
+            <div class="p-info">
               <div class="p-price">${p.price.toLocaleString()}원</div>
-              <button class="btn" data-act="plus">＋</button>
-            </div>
-            <div class="badgeCircle" id="badge-${key}">0</div>
-            <div class="cardBottom">
               <div class="p-name">${p.name}</div>
+            </div>
+            <div class="qtyCol">
+              <button class="btn" data-act="plus">＋</button>
+              <div class="badgeCircle" id="badge-${key}">0</div>
               <button class="btn" data-act="minus">−</button>
             </div>`;
           
@@ -221,7 +220,7 @@
             const act=e.target?.dataset?.act;
             if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
             else if(act==='plus'){ cart[key]=(cart[key]||0)+1; }
-            else { cart[key]=(cart[key]||0)+1; } // 카드 아무 곳 클릭 시 +1
+            else { cart[key]=(cart[key]||0)+1; }
             render();
           });
           grid.appendChild(card);
