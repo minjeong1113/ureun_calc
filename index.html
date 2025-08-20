@@ -30,37 +30,91 @@
     @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,1fr);} }
     @media (max-width:880px){ .grid{grid-template-columns:repeat(2,1fr);} }
 
-    .product{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
-      padding:8px;box-shadow:var(--shadow);
-      display:flex;flex-direction:row;align-items:flex-start;gap:6px;
-      cursor:pointer;transition:0.2s;
-      width:160px; /* 카드 가로폭 좁게 */
-    }
-    .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
+.product{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  padding:8px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  gap:6px;
+  cursor:pointer;
+  transition:0.2s;
+  width:185px; /* 카드 가로폭 고정 */
+}
+.product.selected{
+  border:2px solid var(--accent);
+  box-shadow:0 0 0 3px rgba(37,99,235,0.2);
+}
 
-    .leftCol{
-      display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;
-    }
-    .topRow{
-      display:flex;flex-direction:row;align-items:center;gap:6px;
-    }
-    .p-thumb{width:50px;height:50px;border-radius:6px;object-fit:cover;background:#eef2f7;}
-    .p-price{font-size:14px;font-weight:700;color:var(--accent);}
-    .p-name{font-size:13px;font-weight:600;text-align:center;margin-top:4px;}
+.leftCol{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start; /* 왼쪽 정렬 */
+  gap:4px;
+  flex:1;
+}
 
-    .qtyCol{display:flex;flex-direction:column;align-items:center;gap:4px;}
-    .btn{
-      border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
-      width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .badgeCircle{
-      width:28px;height:28px;border-radius:50%;
-      border:1px solid var(--line);
-      display:flex;align-items:center;justify-content:center;
-      font-weight:700;
-    }
+.topRow{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:6px;
+  width:100%;
+}
+
+.p-thumb{
+  width:50px;
+  height:50px;
+  border-radius:6px;
+  object-fit:cover;
+  background:#eef2f7;
+}
+
+.p-price{
+  font-size:14px;
+  font-weight:700;
+  color:var(--accent);
+  white-space:nowrap;
+}
+
+.p-name{
+  font-size:13px;
+  font-weight:600;
+  white-space:nowrap;        /* 줄바꿈 방지 */
+  overflow:hidden;           /* 넘치면 잘라냄 */
+  text-overflow:ellipsis;    /* 말줄임표(...) 처리 */
+  max-width:100%;            /* 영역 안에서만 표시 */
+}
+
+.qtyCol{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+
+.btn{
+  border:1px solid var(--line);
+  background:#f3f5fa;
+  border-radius:8px;
+  width:28px;height:28px;
+  cursor:pointer;
+  font-weight:800;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.badgeCircle{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;
+}
 
     .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
       padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
@@ -211,19 +265,19 @@
           const src=p.img.startsWith("http")?p.img:`${IMG_BASE}/${p.img}`;
           const card=document.createElement('div'); card.className='product'; card.id=`card-${key}`;
           card.innerHTML=`
-            <div class="leftCol">
-              <div class="topRow">
-                <img class="p-thumb" alt="${p.name}" src="${src}">
-                <div class="p-price">${p.price.toLocaleString()}원</div>
-              </div>
-              <div class="p-name">${p.name}</div>
-            </div>
-            <div class="qtyCol">
-              <button class="btn" data-act="plus">＋</button>
-              <div class="badgeCircle" id="badge-${key}">0</div>
-              <button class="btn" data-act="minus">−</button>
-            </div>`;
-          
+  <div class="leftCol">
+    <div class="topRow">
+      <img class="p-thumb" alt="${p.name}" src="${src}">
+      <div class="p-price">${p.price.toLocaleString()}원</div>
+    </div>
+    <div class="p-name">${p.name}</div>
+  </div>
+  <div class="qtyCol">
+    <button class="btn" data-act="plus">＋</button>
+    <div class="badgeCircle" id="badge-${key}">0</div>
+    <button class="btn" data-act="minus">−</button>
+  </div>`;
+
           card.addEventListener('click',(e)=>{
             const act=e.target?.dataset?.act;
             if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
