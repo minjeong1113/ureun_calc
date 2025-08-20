@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
 
   <style>
-    :root{
+   :root{
   --bg:#f7f8fb; --card:#ffffff; --line:#e6e8f0; --fg:#0e1116; --muted:#6b7280; --accent:#2563eb; --ink:#ffffff;
   --r-xl:14px; --r-md:12px; --shadow:0 8px 24px rgba(15,23,42,.06);
 }
@@ -25,7 +25,7 @@ body{
   margin:8px auto;
   padding:0 14px;
   display:grid;
-  grid-template-columns: 62% 38%; /* 메인 62%, 장바구니 38% */
+  grid-template-columns: 60% 40%; /* 메인 60%, 장바구니 40% */
   column-gap:20px;
   min-height:calc(100dvh - 16px);
   overflow-x:hidden;
@@ -34,12 +34,18 @@ body{
 .cat{margin-top:0}
 .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
 
-/* 카드 그리드: 최소 220px */
+/* 제품 카드 그리드: 큰 화면은 무조건 4칸 */
 .grid {
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 기본 4칸 고정 */
   gap:12px;
-  align-items: stretch; /* 행 안에서 높이 균일 */
+  align-items: stretch;
+}
+@media (max-width:1180px){
+  .grid{grid-template-columns:repeat(3,1fr);} /* 작은 화면: 3칸 */
+}
+@media (max-width:880px){
+  .grid{grid-template-columns:repeat(2,1fr);} /* 모바일: 2칸 */
 }
 
 /* 제품 카드 */
@@ -76,9 +82,9 @@ body{
 
 /* 장바구니 패널 */
 .panel{
-  flex:0 0 460px;
-  min-width:400px;
-  max-width:520px;
+  flex:0 0 480px;
+  min-width:420px;
+  max-width:560px;
   background:var(--card);
   border:1px solid var(--line);
   border-radius:var(--r-xl);
