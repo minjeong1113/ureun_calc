@@ -25,96 +25,28 @@
     
     .cat{margin-top:0}
     .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
-    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-    @media (max-width:1800px){ .grid{grid-template-columns:repeat(4,1fr);} }
-    @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,1fr);} }
-    @media (max-width:880px){ .grid{grid-template-columns:repeat(2,1fr);} }
+    .grid{display:grid;grid-template-columns:repeat(5,185px);gap:10px;}
+    @media (max-width:1800px){ .grid{grid-template-columns:repeat(4,185px);} }
+    @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,185px);} }
+    @media (max-width:880px){ .grid{grid-template-columns:repeat(2,185px);} }
 
-.product{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  padding:8px;
-  box-shadow:var(--shadow);
-  display:flex;
-  flex-direction:row;
-  align-items:flex-start;
-  gap:6px;
-  cursor:pointer;
-  transition:0.2s;
-  width:185px; /* 카드 가로폭 고정 */
-}
-.product.selected{
-  border:2px solid var(--accent);
-  box-shadow:0 0 0 3px rgba(37,99,235,0.2);
-}
+    .product{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+      padding:10px;box-shadow:var(--shadow);
+      display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:0.2s;
+      width:185px;
+    }
+    .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
+    .p-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#eef2f7;}
+    .p-info{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+    .p-name{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
+    .p-price{font-size:12.5px;color:var(--accent);}
 
-.leftCol{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start; /* 왼쪽 정렬 */
-  gap:4px;
-  flex:1;
-}
-
-.topRow{
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  gap:6px;
-  width:100%;
-}
-
-.p-thumb{
-  width:50px;
-  height:50px;
-  border-radius:6px;
-  object-fit:cover;
-  background:#eef2f7;
-}
-
-.p-price{
-  font-size:14px;
-  font-weight:700;
-  color:var(--accent);
-  white-space:nowrap;
-}
-
-.p-name{
-  font-size:13px;
-  font-weight:600;
-  white-space:nowrap;        /* 줄바꿈 방지 */
-  overflow:hidden;           /* 넘치면 잘라냄 */
-  text-overflow:ellipsis;    /* 말줄임표(...) 처리 */
-  max-width:100%;            /* 영역 안에서만 표시 */
-}
-
-.qtyCol{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-}
-
-.btn{
-  border:1px solid var(--line);
-  background:#f3f5fa;
-  border-radius:8px;
-  width:28px;height:28px;
-  cursor:pointer;
-  font-weight:800;
-  font-size:16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.badgeCircle{
-  width:28px;height:28px;border-radius:50%;
-  border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:700;
-}
+    .qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;}
+    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
+      width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
+      display:flex;align-items:center;justify-content:center;}
+    .badge{min-width:34px;text-align:center;font-weight:800;}
 
     .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
       padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
@@ -154,6 +86,7 @@
           <tbody id="cartBody"></tbody>
         </table>
         <div class="totals">
+          <div class="totalLine"><span>총 수량</span><strong id="totalQty">0개</strong></div>
           <div class="totalLine"><span>총합</span><strong id="grand">0원</strong></div>
           <div class="totalLine gift"><span>사은품</span><span id="gift">없음</span></div>
         </div>
@@ -162,136 +95,135 @@
       <div class="note">전송 후 모든 항목이 초기화됩니다.</div>
     </aside>
   </div>
+<script>
+const IMG_BASE = "images"; 
 
-  <form id="orderForm" method="POST" action="https://docs.google.com/forms/d/e/FORM_ID/formResponse" target="hiddenFrame" style="display:none"></form>
-  <iframe name="hiddenFrame" style="display:none"></iframe>
+// 제품 데이터 (예시: 실제로는 민정님 상품 리스트 반영)
+const products = [
+  {key:"p1", name:"제품1", price:10000, img:"p1.jpg"},
+  {key:"p2", name:"제품2", price:20000, img:"p2.jpg"},
+  {key:"p3", name:"제품3", price:30000, img:"p3.jpg"},
+  // ... 나머지 상품도 이어서
+];
+const productMap = Object.fromEntries(products.map(p=>[p.key,p]));
 
-  <script>
-    const IMG_BASE = "images"; 
-    const catsEl = document.getElementById('cats');
-    const cartEmptyEl = document.getElementById('cartEmpty');
-    const cartWrapEl = document.getElementById('cartWrap');
-    const cartBodyEl = document.getElementById('cartBody');
-    const grandEl = document.getElementById('grand');
-    const giftEl = document.getElementById('gift');
-    const payBtn = document.getElementById('pay');
-    const formEl = document.getElementById('orderForm');
+const catsEl = document.getElementById('cats');
+const cartEmptyEl = document.getElementById('cartEmpty');
+const cartWrapEl = document.getElementById('cartWrap');
+const cartBodyEl = document.getElementById('cartBody');
+const grandEl = document.getElementById('grand');
+const giftEl = document.getElementById('gift');
+let cart = {};
 
-    const cart = {};
-    const productMap = {};
-
-    function giftBy(total){
-      if (total >= 100000) return "마스크팩 + 립밤 중 택1 + 리사이클파우치";
-      if (total >= 50000)  return "마스크팩 + 립밤 중 택1";
-      if (total >= 30000)  return "마스크팩";
-      return "없음";
-    }
-
-    function render(){
-      Object.keys(productMap).forEach(k=>{
-        document.getElementById(`badge-${k}`).textContent = String(cart[k]||0);
-        const card = document.getElementById(`card-${k}`);
-        if (cart[k] > 0) card.classList.add("selected");
-        else card.classList.remove("selected");
-      });
-
-      const keys = Object.keys(cart);
-      if (!keys.length){
-        cartEmptyEl.style.display=''; 
-        cartWrapEl.style.display='none'; 
-        grandEl.textContent='0원'; 
-        giftEl.textContent='없음'; 
-        return;
-      }
-      cartEmptyEl.style.display='none'; 
-      cartWrapEl.style.display='';
-
-      let total=0;
-      cartBodyEl.innerHTML = keys.map(k=>{
-        const p = productMap[k], q = cart[k], sub=q*p.price; total+=sub;
-        return `<tr data-key="${k}">
-          <td class="nameCell" title="${p.name}">${p.name}</td>
-          <td><div class="qtyCtl"><button class="btn-sm" data-act="minus">−</button><span>${q}</span><button class="btn-sm" data-act="plus">＋</button></div></td>
-          <td>${p.price.toLocaleString()}원</td>
-          <td>${sub.toLocaleString()}원</td>
-        </tr>`;
-      }).join('');
-
-      grandEl.textContent = `${total.toLocaleString()}원`;
-      giftEl.textContent  = giftBy(total);
-    }
-
-    cartBodyEl.addEventListener('click',(e)=>{
-      const btn=e.target.closest('button'); if(!btn) return;
-      const key=e.target.closest('tr')?.dataset?.key; if(!key) return;
-      if (btn.dataset.act==='plus') cart[key]=(cart[key]||0)+1;
-      else if (btn.dataset.act==='minus'){ if ((cart[key]||0)>0) cart[key]--; if (cart[key]===0) delete cart[key]; }
-      render();
-    });
-
-    payBtn.addEventListener('click',()=>{
-      const keys=Object.keys(cart); if(!keys.length){ alert('상품을 선택하세요.'); return; }
-      formEl.innerHTML='';
-      keys.forEach(k=>{
-        const p=productMap[k], q=cart[k];
-        formEl.innerHTML+=`<input type="hidden" name="entry.ITEM_NAME" value="${p.name}">
-                            <input type="hidden" name="entry.ITEM_QTY" value="${q}">
-                            <input type="hidden" name="entry.ITEM_PRICE" value="${p.price}">`;
-      });
-      formEl.innerHTML+=`<input type="hidden" name="entry.TOTAL" value="${grandEl.textContent.replace(/[^0-9]/g,'')}">
-                          <input type="hidden" name="entry.GIFT" value="${giftEl.textContent}">
-                          <input type="hidden" name="entry.TIMESTAMP" value="${(new Date()).toISOString()}">`;
-      formEl.submit(); for (const k of keys) delete cart[k]; render();
-      window.scrollTo({top:0,behavior:'smooth'}); alert('제출되었습니다.');
-    });
-
-    async function loadProducts() {
-      const res = await fetch("https://opensheet.elk.sh/1QpbkNSpsAoKhgMbCtHUhz97D5epuUqoGt7esf1-u-fw/sheet1");
-      const rows = await res.json();
-      const categories = {};
-      rows.forEach(r=>{
-        const cat=r["카테고리"]||"기타";
-        if(!categories[cat]) categories[cat]=[];
-        categories[cat].push({name:r["상품명"],price:Number(r["판매가"].replace(/,/g,"")),img:r["이미지"]});
-      });
-
-      Object.entries(categories).forEach(([catName,items],ci)=>{
-        const sec=document.createElement('section');
-        sec.className='cat'; sec.innerHTML=`<h3>${catName}</h3><div class="grid"></div>`;
-        const grid=sec.querySelector('.grid');
-
-        items.forEach((p,pi)=>{
-          const key=`${ci}-${pi}`; productMap[key]=p;
-          const src=p.img.startsWith("http")?p.img:`${IMG_BASE}/${p.img}`;
-          const card=document.createElement('div'); card.className='product'; card.id=`card-${key}`;
-          card.innerHTML=`
-  <div class="leftCol">
-    <div class="topRow">
-      <img class="p-thumb" alt="${p.name}" src="${src}">
-      <div class="p-price">${p.price.toLocaleString()}원</div>
+// 카테고리 & 카드 그리기
+catsEl.innerHTML = `
+  <div class="cat">
+    <h3>카테고리</h3>
+    <div class="grid">
+      ${products.map(p=>`
+        <div class="product" id="card-${p.key}" onclick="add('${p.key}')">
+          <img class="p-thumb" src="${IMG_BASE}/${p.img}" alt="">
+          <div class="p-info">
+            <div class="p-name">${p.name}</div>
+            <div class="p-price">${p.price.toLocaleString()}원</div>
+          </div>
+          <div class="qtyRow">
+            <button class="btn" onclick="event.stopPropagation();sub('${p.key}')">−</button>
+            <span class="badge" id="badge-${p.key}">0</span>
+            <button class="btn" onclick="event.stopPropagation();add('${p.key}')">＋</button>
+          </div>
+        </div>
+      `).join('')}
     </div>
-    <div class="p-name">${p.name}</div>
   </div>
-  <div class="qtyCol">
-    <button class="btn" data-act="plus">＋</button>
-    <div class="badgeCircle" id="badge-${key}">0</div>
-    <button class="btn" data-act="minus">−</button>
-  </div>`;
+`;
 
-          card.addEventListener('click',(e)=>{
-            const act=e.target?.dataset?.act;
-            if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
-            else if(act==='plus'){ cart[key]=(cart[key]||0)+1; }
-            else { cart[key]=(cart[key]||0)+1; }
-            render();
-          });
-          grid.appendChild(card);
-        });
-        catsEl.appendChild(sec);
-      });
-      render();
-    }
-    window.addEventListener("DOMContentLoaded", loadProducts);
-  </script>
+// 담기 / 빼기
+function add(k){ cart[k]=(cart[k]||0)+1; render(); }
+function sub(k){ if(cart[k]){ cart[k]--; if(cart[k]<=0) delete cart[k]; render(); }}
+
+// 사은품 로직
+function giftBy(total){
+  if(total>=100000) return "마스크팩 + 립밤 중 택1 + 리사이클파우치";
+  if(total>=50000)  return "마스크팩 + 립밤 중 택1";
+  if(total>=30000)  return "마스크팩";
+  return "없음";
+}
+
+// 렌더링 (총 수량 포함)
+function render(){
+  Object.keys(productMap).forEach(k=>{
+    document.getElementById(`badge-${k}`).textContent = String(cart[k]||0);
+    const card=document.getElementById(`card-${k}`);
+    if(cart[k]>0) card.classList.add("selected");
+    else card.classList.remove("selected");
+  });
+
+  const keys=Object.keys(cart);
+  if(!keys.length){
+    cartEmptyEl.style.display='';
+    cartWrapEl.style.display='none';
+    grandEl.textContent='0원';
+    giftEl.textContent='없음';
+    document.getElementById('totalQty').textContent='0개';
+    return;
+  }
+  cartEmptyEl.style.display='none';
+  cartWrapEl.style.display='';
+
+  let total=0,totalQty=0;
+  cartBodyEl.innerHTML=keys.map(k=>{
+    const p=productMap[k],q=cart[k],sub=q*p.price;
+    total+=sub; totalQty+=q;
+    return `<tr data-key="${k}">
+      <td class="nameCell" title="${p.name}">${p.name}</td>
+      <td><div class="qtyCtl">
+        <button class="btn-sm" data-act="minus">−</button>
+        <span>${q}</span>
+        <button class="btn-sm" data-act="plus">＋</button>
+      </div></td>
+      <td>${p.price.toLocaleString()}원</td>
+      <td>${sub.toLocaleString()}원</td>
+    </tr>`;
+  }).join('');
+
+  grandEl.textContent=`${total.toLocaleString()}원`;
+  giftEl.textContent=giftBy(total);
+  document.getElementById('totalQty').textContent=`${totalQty}개`;
+}
+
+// 수량 조절 버튼 이벤트
+cartBodyEl.addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(!btn) return;
+  const tr=e.target.closest('tr');
+  const key=tr.dataset.key;
+  if(btn.dataset.act==='minus') sub(key);
+  if(btn.dataset.act==='plus') add(key);
+});
+
+// 전송 로직
+document.getElementById('pay').addEventListener('click',()=>{
+  if(!Object.keys(cart).length){ alert("선택된 제품이 없습니다."); return; }
+
+  const formData=new FormData();
+
+  // 여기서 entry 매핑 (예: 23개 전부)
+  // 예시는 p1 → entry.641954362, p2 → entry.73760492 ...
+  if(cart["p1"]) formData.append("entry.641954362", cart["p1"]);
+  if(cart["p2"]) formData.append("entry.73760492", cart["p2"]);
+  if(cart["p3"]) formData.append("entry.527065283", cart["p3"]);
+  // ... 나머지 23개 전부 이어서 넣기
+
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLSdHqrnkW6r7.../formResponse",{
+    method:"POST",
+    body:formData,
+    mode:"no-cors"
+  });
+
+  alert("전송 완료!");
+  cart={}; render();
+});
+</script>
 </body>
 </html>
