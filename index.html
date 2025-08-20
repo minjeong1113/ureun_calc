@@ -1,1 +1,247 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/><title>유아른 계산기</title><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css"><style>:root{--bg:#f7f8fb;--card:#fff;--line:#e6e8f0;--fg:#0e1116;--muted:#6b7280;--accent:#2563eb;--ink:#fff;--r-xl:14px;--r-md:12px;--shadow:0 8px 24px rgba(15,23,42,.06);}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14.5px/1.55 Pretendard,system-ui,-apple-system,Segoe UI,Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}.page{max-width:2360px;margin:8px auto;padding:0 14px;display:grid;grid-template-columns:3fr 2fr;column-gap:20px;row-gap:0;min-height:calc(100dvh - 16px)}.cat{margin-top:0}.cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}@media(max-width:1800px){.grid{grid-template-columns:repeat(4,1fr)}}@media(max-width:1180px){.grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}.product{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:.2s}.product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.2)}.topRow{display:flex;align-items:center;gap:10px}.p-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#eef2f7}.p-info{flex:1;display:flex;flex-direction:column;gap:2px}.p-name{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.p-price{font-size:12.5px;color:var(--accent)}.qtyRow{display:flex;justify-content:center;align-items:center;gap:6px}.btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center}.badge{min-width:34px;text-align:center;font-weight:800}.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);max-height:calc(100dvh - 20px);overflow:auto;min-width:560px}.panel h3{margin:0 0 8px;font-size:15px;font-weight:800}.empty{padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:#6b7280;background:#fafbff}table{width:100%;border-collapse:separate;border-spacing:0;margin-top:6px;border-radius:12px;border:1px solid var(--line);table-layout:fixed}thead th{background:#f6f7fb;font-weight:700;font-size:12.5px;padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0}tbody td{padding:8px;border-bottom:1px solid var(--line);font-size:13.5px}tbody tr:nth-child(even){background:#fafbff}.qtyCtl{display:inline-flex;align-items:center;gap:6px}.btn-sm{width:24px;height:24px;border:1px solid var(--line);background:#f3f5fa;border-radius:6px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center}.totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}.totalLine{display:flex;justify-content:space-between;align-items:center}.gift{font-weight:800}.actions{margin-top:10px;display:flex;gap:8px}.pay{flex:1;background:var(--accent);border:1px solid var(--accent);color:var(--ink);border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;font-size:15px}.note{font-size:12px;color:#6b7280;margin-top:6px}</style></head><body><div class="page"><main><div id="cats"></div></main><aside class="panel"><h3>선택한 제품</h3><div id="cartEmpty" class="empty">아직 선택된 제품이 없습니다.</div><div id="cartWrap" style="display:none"><table><thead><tr><th style="width:40%">상품명</th><th style="width:16%">수량</th><th style="width:17%">단가</th><th style="width:17%">금액</th></tr></thead><tbody id="cartBody"></tbody></table><div class="totals"><div class="totalLine"><span>총합</span><strong id="grand">0원</strong></div><div class="totalLine"><span>총 수량</span><strong id="totalQty">0개</strong></div><div class="totalLine gift"><span>사은품</span><span id="gift">없음</span></div></div><div class="actions"><button id="pay" class="pay">결제</button></div></div><div class="note">전송 후 모든 항목이 초기화됩니다.</div></aside></div><form id="orderForm" method="POST" action="https://docs.google.com/forms/d/e/FORM_ID/formResponse" target="hiddenFrame" style="display:none"></form><iframe name="hiddenFrame" style="display:none"></iframe><script>const IMG_BASE="images";const catsEl=document.getElementById("cats"),cartEmptyEl=document.getElementById("cartEmpty"),cartWrapEl=document.getElementById("cartWrap"),cartBodyEl=document.getElementById("cartBody"),grandEl=document.getElementById("grand"),giftEl=document.getElementById("gift"),payBtn=document.getElementById("pay"),formEl=document.getElementById("orderForm"),cart={},productMap={};function giftBy(t){return t>=1e5?"마스크팩 + 립밤 중 택1 + 리사이클파우치":t>=5e4?"마스크팩 + 립밤 중 택1":t>=3e4?"마스크팩":"없음"}function render(){Object.keys(productMap).forEach(t=>{document.getElementById(`badge-${t}`).textContent=String(cart[t]||0);const e=document.getElementById(`card-${t}`);cart[t]>0?e.classList.add("selected"):e.classList.remove("selected")});const t=Object.keys(cart);if(!t.length)return cartEmptyEl.style.display="",cartWrapEl.style.display="none",grandEl.textContent="0원",giftEl.textContent="없음",document.getElementById("totalQty").textContent="0개";cartEmptyEl.style.display="none",cartWrapEl.style.display="";let e=0,a=0;cartBodyEl.innerHTML=t.map(t=>{const r=productMap[t],n=cart[t],c=n*r.price;return e+=c,a+=n,`<tr data-key="${t}"><td class="nameCell" title="${r.name}">${r.name}</td><td><div class="qtyCtl"><button class="btn-sm" data-act="minus">−</button><span>${n}</span><button class="btn-sm" data-act="plus">＋</button></div></td><td>${r.price.toLocaleString()}원</td><td>${c.toLocaleString()}원</td></tr>`}).join(""),grandEl.textContent=`${e.toLocaleString()}원`,giftEl.textContent=giftBy(e),document.getElementById("totalQty").textContent=`${a}개`}cartBodyEl.addEventListener("click",t=>{const e=t.target.closest("button");if(!e)return;const a=t.target.closest("tr")?.dataset?.key;if(!a)return;"plus"===e.dataset.act?cart[a]=(cart[a]||0)+1:"minus"===e.dataset.act&&((cart[a]||0)>0&&cart[a]--,0===cart[a]&&delete cart[a]),render()});payBtn.addEventListener("click",()=>{const t=Object.keys(cart);if(!t.length)return alert("상품을 선택하세요.");formEl.innerHTML="",t.forEach(t=>{const e=productMap[t],a=cart[t];formEl.innerHTML+=`<input type="hidden" name="entry.ITEM_NAME" value="${e.name}"><input type="hidden" name="entry.ITEM_QTY" value="${a}"><input type="hidden" name="entry.ITEM_PRICE" value="${e.price}">`}),formEl.innerHTML+=`<input type="hidden" name="entry.TOTAL" value="${grandEl.textContent.replace(/[^0-9]/g,"")}"><input type="hidden" name="entry.GIFT" value="${giftEl.textContent}"><input type="hidden" name="entry.TIMESTAMP" value="${(new Date).toISOString()}">`,formEl.submit();for(const e of t)delete cart[e];render(),window.scrollTo({top:0,behavior:"smooth"}),alert("제출되었습니다.")});async function loadProducts(){const t=await fetch("https://opensheet.elk.sh/1QpbkNSpsAoKhgMbCtHUhz97D5epuUqoGt7esf1-u-fw/sheet1"),e=await t.json(),a={};e.forEach(t=>{const e=t["카테고리"]||"기타";a[e]||(a[e]=[]),a[e].push({name:t["상품명"],price:Number(t["판매가"].replace(/,/g,"")),img:t["이미지"]})}),Object.entries(a).forEach(([t,e],a)=>{const r=document.createElement("section");r.className="cat",r.innerHTML=`<h3>${t}</h3><div class="grid"></div>`;const n=r.querySelector(".grid");e.forEach((t,e)=>{const r=`${a}-${e}`;productMap[r]=t;const c=t.img.startsWith("http")?t.img:`${IMG_BASE}/${t.img}`,o=document.createElement("div");o.className="product",o.id=`card-${r}`,o.innerHTML=`<div class="topRow"><img class="p-thumb" alt="${t.name}" src="${c}"><div class="p-info"><div class="p-name">${t.name}</div><div class="p-price">${t.price.toLocaleString()}원</div></div></div><div class="qtyRow"><button class="btn" data-act="minus">−</button><div class="badge" id="badge-${r}">0</div><button class="btn" data-act="plus">＋</button></div>`,o.addEventListener("click",e=>{const a=e.target?.dataset?.act;"minus"===a?((cart[r]||0)>0&&cart[r]--,0===cart[r]&&delete cart[r]):cart[r]=(cart[r]||0)+1,render()}),n.appendChild(o)}),catsEl.appendChild(r)}),render()}window.addEventListener("DOMContentLoaded",loadProducts);</script></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>유아른 계산기</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
+
+  <style>
+    :root{
+      --bg:#f7f8fb; --card:#ffffff; --line:#e6e8f0; --fg:#0e1116; --muted:#6b7280; --accent:#2563eb; --ink:#ffffff;
+      --r-xl:14px; --r-md:12px; --shadow:0 8px 24px rgba(15,23,42,.06);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;background:var(--bg);color:var(--fg);
+      font:14.5px/1.55 Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+
+    .page{max-width:2360px;margin:8px auto;padding:0 14px;
+      display:grid;grid-template-columns:3fr 2fr;column-gap:20px;row-gap:0;
+      min-height:calc(100dvh - 16px);}
+    
+    .cat{margin-top:0}
+    .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
+    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+    @media (max-width:1800px){ .grid{grid-template-columns:repeat(4,1fr);} }
+    @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,1fr);} }
+    @media (max-width:880px){ .grid{grid-template-columns:repeat(2,1fr);} }
+
+    .product{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+      padding:10px;box-shadow:var(--shadow);
+      display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:0.2s;
+    }
+    .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
+    .topRow{display:flex;align-items:center;gap:10px;}
+    .p-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#eef2f7;}
+    .p-info{flex:1;display:flex;flex-direction:column;gap:2px;}
+    .p-name{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .p-price{font-size:12.5px;color:var(--accent);}
+    .qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;}
+    .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
+      width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
+      display:flex;align-items:center;justify-content:center;}
+    .badge{min-width:34px;text-align:center;font-weight:800;}
+
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
+      padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
+      max-height:calc(100dvh - 20px);overflow:auto;min-width:560px;}
+    .panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
+    .empty{padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:#6b7280;background:#fafbff}
+    table{width:100%;border-collapse:separate;border-spacing:0;margin-top:6px;border-radius:12px;border:1px solid var(--line);table-layout:fixed}
+    thead th{background:#f6f7fb;font-weight:700;font-size:12.5px;padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0;}
+    tbody td{padding:8px;border-bottom:1px solid var(--line);font-size:13.5px;}
+    tbody tr:nth-child(even){background:#fafbff}
+    .qtyCtl{display:inline-flex;align-items:center;gap:6px}
+    .btn-sm{width:24px;height:24px;border:1px solid var(--line);background:#f3f5fa;border-radius:6px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center}
+    .totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+    .totalLine{display:flex;justify-content:space-between;align-items:center}
+    .gift{font-weight:800}
+    .actions{margin-top:10px;display:flex;gap:8px}
+    .pay{flex:1;background:var(--accent);border:1px solid var(--accent);color:var(--ink);border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;font-size:15px}
+    .note{font-size:12px;color:#6b7280;margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main><div id="cats"></div></main>
+    <aside class="panel">
+      <h3>선택한 제품</h3>
+      <div id="cartEmpty" class="empty">아직 선택된 제품이 없습니다.</div>
+      <div id="cartWrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40%">상품명</th>
+              <th style="width:20%">수량</th>
+              <th style="width:20%">단가</th>
+              <th style="width:20%">금액</th>
+            </tr>
+          </thead>
+          <tbody id="cartBody"></tbody>
+        </table>
+        <div class="totals">
+          <div class="totalLine"><span>총합</span><strong id="grand">0원</strong></div>
+          <div class="totalLine gift"><span>사은품</span><span id="gift">없음</span></div>
+          <div class="totalLine"><span>총 수량</span><span id="totalQty">0개</span></div>
+        </div>
+        <div class="actions"><button id="pay" class="pay">결제</button></div>
+      </div>
+      <div class="note">전송 후 모든 항목이 초기화됩니다.</div>
+    </aside>
+  </div>
+
+  <form id="orderForm" method="POST" action="https://docs.google.com/forms/d/e/1cryf-fcEGA-qF1F54cN857YNftaFtpH4FRPRMkAtOt0/formResponse" target="hiddenFrame" style="display:none"></form>
+  <iframe name="hiddenFrame" style="display:none"></iframe>
+
+  <script>
+    const IMG_BASE = "images"; 
+    const catsEl = document.getElementById('cats');
+    const cartEmptyEl = document.getElementById('cartEmpty');
+    const cartWrapEl = document.getElementById('cartWrap');
+    const cartBodyEl = document.getElementById('cartBody');
+    const grandEl = document.getElementById('grand');
+    const giftEl = document.getElementById('gift');
+    const totalQtyEl = document.getElementById('totalQty');
+    const payBtn = document.getElementById('pay');
+    const formEl = document.getElementById('orderForm');
+
+    const cart = {};
+    const productMap = {};
+
+    function giftBy(total){
+      if (total >= 100000) return "마스크팩 + 립밤 중 택1 + 리사이클파우치";
+      if (total >= 50000)  return "마스크팩 + 립밤 중 택1";
+      if (total >= 30000)  return "마스크팩";
+      return "없음";
+    }
+    function render(){
+      Object.keys(productMap).forEach(k=>{
+        document.getElementById(`badge-${k}`).textContent = String(cart[k]||0);
+        const card = document.getElementById(`card-${k}`);
+        if (cart[k] > 0) card.classList.add("selected");
+        else card.classList.remove("selected");
+      });
+
+      const keys = Object.keys(cart);
+      if (!keys.length){
+        cartEmptyEl.style.display=''; 
+        cartWrapEl.style.display='none'; 
+        grandEl.textContent='0원'; 
+        giftEl.textContent='없음'; 
+        totalQtyEl.textContent='0개';
+        return;
+      }
+      cartEmptyEl.style.display='none'; 
+      cartWrapEl.style.display='';
+
+      let total=0;
+      let totalQty=0;
+      cartBodyEl.innerHTML = keys.map(k=>{
+        const p = productMap[k], q = cart[k], sub=q*p.price; 
+        total+=sub;
+        totalQty+=q;
+        return `<tr data-key="${k}">
+          <td class="nameCell" title="${p.name}">${p.name}</td>
+          <td><div class="qtyCtl"><button class="btn-sm" data-act="minus">−</button><span>${q}</span><button class="btn-sm" data-act="plus">＋</button></div></td>
+          <td>${p.price.toLocaleString()}원</td>
+          <td>${sub.toLocaleString()}원</td>
+        </tr>`;
+      }).join('');
+
+      grandEl.textContent = `${total.toLocaleString()}원`;
+      giftEl.textContent  = giftBy(total);
+      totalQtyEl.textContent = `${totalQty}개`;
+    }
+
+    cartBodyEl.addEventListener('click',(e)=>{
+      const btn=e.target.closest('button'); if(!btn) return;
+      const key=e.target.closest('tr')?.dataset?.key; if(!key) return;
+      if (btn.dataset.act==='plus') cart[key]=(cart[key]||0)+1;
+      else if (btn.dataset.act==='minus'){ if ((cart[key]||0)>0) cart[key]--; if (cart[key]===0) delete cart[key]; }
+      render();
+    });
+    payBtn.addEventListener('click',()=>{
+      const keys=Object.keys(cart); 
+      if(!keys.length){ alert('상품을 선택하세요.'); return; }
+      formEl.innerHTML='';
+
+      // ====== 23개 entry 매핑 ======
+      // 민정님이 정리해주신 시트 기준
+      keys.forEach(k=>{
+        const p=productMap[k], q=cart[k];
+        formEl.innerHTML+=`
+          <input type="hidden" name="entry.641954362" value="${p.name}">
+          <input type="hidden" name="entry.73760492" value="${q}">
+          <input type="hidden" name="entry.527065283" value="${p.price}">
+        `;
+      });
+
+      // 총합 / 사은품 / 총 수량
+      formEl.innerHTML+=`
+        <input type="hidden" name="entry.1954562651" value="${grandEl.textContent.replace(/[^0-9]/g,'')}">
+        <input type="hidden" name="entry.661056142" value="${giftEl.textContent}">
+        <input type="hidden" name="entry.358376705" value="${totalQtyEl.textContent.replace(/[^0-9]/g,'')}">
+        <input type="hidden" name="entry.1894876668" value="${(new Date()).toISOString()}">
+      `;
+
+      formEl.submit(); 
+      for (const k of keys) delete cart[k]; 
+      render();
+      window.scrollTo({top:0,behavior:'smooth'}); 
+      alert('제출되었습니다.');
+    });
+
+    async function loadProducts() {
+      const res = await fetch("https://opensheet.elk.sh/1QpbkNSpsAoKhgMbCtHUhz97D5epuUqoGt7esf1-u-fw/sheet1");
+      const rows = await res.json();
+      const categories = {};
+      rows.forEach(r=>{
+        const cat=r["카테고리"]||"기타";
+        if(!categories[cat]) categories[cat]=[];
+        categories[cat].push({name:r["상품명"],price:Number(r["판매가"].replace(/,/g,"")),img:r["이미지"]});
+      });
+
+      Object.entries(categories).forEach(([catName,items],ci)=>{
+        const sec=document.createElement('section');
+        sec.className='cat'; sec.innerHTML=`<h3>${catName}</h3><div class="grid"></div>`;
+        const grid=sec.querySelector('.grid');
+
+        items.forEach((p,pi)=>{
+          const key=`${ci}-${pi}`; productMap[key]=p;
+          const src=p.img.startsWith("http")?p.img:`${IMG_BASE}/${p.img}`;
+          const card=document.createElement('div'); card.className='product'; card.id=`card-${key}`;
+          card.innerHTML=`
+            <div class="topRow">
+              <img class="p-thumb" alt="${p.name}" src="${src}">
+              <div class="p-info">
+                <div class="p-name">${p.name}</div>
+                <div class="p-price" style="color:var(--accent)">${p.price.toLocaleString()}원</div>
+              </div>
+            </div>
+            <div class="qtyRow">
+              <button class="btn" data-act="minus">−</button>
+              <div class="badge" id="badge-${key}">0</div>
+              <button class="btn" data-act="plus">＋</button>
+            </div>`;
+          card.addEventListener('click',(e)=>{
+            const act=e.target?.dataset?.act;
+            if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
+            else if(act==='plus'){ cart[key]=(cart[key]||0)+1; }
+            else { cart[key]=(cart[key]||0)+1; } 
+            render();
+          });
+          grid.appendChild(card);
+        });
+        catsEl.appendChild(sec);
+      });
+      render();
+    }
+    window.addEventListener("DOMContentLoaded", loadProducts);
+  </script>
+</body>
+</html>
