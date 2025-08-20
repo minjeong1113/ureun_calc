@@ -185,53 +185,77 @@ td.subtotalCell {
       else if (btn.dataset.act==='minus'){ if ((cart[key]||0)>0) cart[key]--; if (cart[key]===0) delete cart[key]; }
       render();
     });
-    payBtn.addEventListener('click',()=>{
-      const keys=Object.keys(cart); if(!keys.length){ alert('상품을 선택하세요.'); return; }
-      formEl.innerHTML='';
+  <script>
+  payBtn.addEventListener('click',()=>{
+    const keys = Object.keys(cart); 
+    if(!keys.length){ 
+      alert('상품을 선택하세요.'); 
+      return; 
+    }
 
-      // 시간 기록
-      formEl.innerHTML += `<input type="hidden" name="entry.641954362" value="${(new Date()).toISOString()}">`;
+    // 새 FormData 준비
+    const fd = new FormData();
 
-      // 상품별 매핑
-      keys.forEach(k=>{
-        const p=productMap[k], q=cart[k];
-        switch(p.name){
-          case "올인원 로션": formEl.innerHTML+=`<input type="hidden" name="entry.73760492" value="${q}">`; break;
-          case "아하파하 앰플": formEl.innerHTML+=`<input type="hidden" name="entry.527065283" value="${q}">`; break;
-          case "사철쑥 에센스": formEl.innerHTML+=`<input type="hidden" name="entry.1954562651" value="${q}">`; break;
-          case "수분 앰플 크림": formEl.innerHTML+=`<input type="hidden" name="entry.661056142" value="${q}">`; break;
-          case "나이트 베리어 크림": formEl.innerHTML+=`<input type="hidden" name="entry.358376705" value="${q}">`; break;
-          case "드라이 샴푸 앰플": formEl.innerHTML+=`<input type="hidden" name="entry.1894876668" value="${q}">`; break;
-          case "약알칼리성 콩클렌징": formEl.innerHTML+=`<input type="hidden" name="entry.2043302855" value="${q}">`; break;
-          case "티트리 시카 모공팩": formEl.innerHTML+=`<input type="hidden" name="entry.209373553" value="${q}">`; break;
-          case "마일드 에어핏 선세럼": formEl.innerHTML+=`<input type="hidden" name="entry.425801880" value="${q}">`; break;
-          case "알로에 다시마 마스크팩": formEl.innerHTML+=`<input type="hidden" name="entry.1513994656" value="${q}">`; break;
-          case "동백 오일 세럼 미스트": formEl.innerHTML+=`<input type="hidden" name="entry.2061672077" value="${q}">`; break;
-          case "기초 4종 트래블키트": formEl.innerHTML+=`<input type="hidden" name="entry.1272730298" value="${q}">`; break;
-          case "혈색 립밤": formEl.innerHTML+=`<input type="hidden" name="entry.2136390372" value="${q}">`; break;
-          case "촉촉 플럼핑 립밤": formEl.innerHTML+=`<input type="hidden" name="entry.61250229" value="${q}">`; break;
-          case "촉촉 립밤": formEl.innerHTML+=`<input type="hidden" name="entry.1050339042" value="${q}">`; break;
-          case "DIY 수제비 토너 패드": formEl.innerHTML+=`<input type="hidden" name="entry.202944705" value="${q}">`; break;
-          case "화산석 오일 컨트롤 롤러": formEl.innerHTML+=`<input type="hidden" name="entry.1337141345" value="${q}">`; break;
-          case "시어버터 핸드크림": formEl.innerHTML+=`<input type="hidden" name="entry.1635291501" value="${q}">`; break;
-          case "바디 워시": formEl.innerHTML+=`<input type="hidden" name="entry.2132279447" value="${q}">`; break;
-          case "바디 로션": formEl.innerHTML+=`<input type="hidden" name="entry.1886270070" value="${q}">`; break;
-          case "바디 케어 세트": formEl.innerHTML+=`<input type="hidden" name="entry.1329246249" value="${q}">`; break;
-        }
-      });
+    // 시간 기록
+    fd.append("entry.641954362", (new Date()).toISOString());
 
-      // 총 수량 / 결제 금액
-      const totalQty = Object.values(cart).reduce((a,b)=>a+b,0);
-      const totalAmt = Object.entries(cart).reduce((sum,[k,q])=> sum + q*productMap[k].price ,0);
-      formEl.innerHTML+=`<input type="hidden" name="entry.307730166" value="${totalQty}">`;
-      formEl.innerHTML+=`<input type="hidden" name="entry.1312485185" value="${totalAmt}">`;
+    // 상품 매핑 테이블
+    const entryMap = {
+      "올인원 로션": 73760492,
+      "아하파하 앰플": 527065283,
+      "사철쑥 에센스": 1954562651,
+      "수분 앰플 크림": 661056142,
+      "나이트 베리어 크림": 358376705,
+      "드라이 샴푸 앰플": 1894876668,
+      "약알칼리성 콩클렌징": 2043302855,
+      "티트리 시카 모공팩": 209373553,
+      "마일드 에어핏 선세럼": 425801880,
+      "알로에 다시마 마스크팩": 1513994656,
+      "동백 오일 세럼 미스트": 2061672077,
+      "기초 4종 트래블키트": 1272730298,
+      "혈색 립밤": 2136390372,
+      "촉촉 플럼핑 립밤": 61250229,
+      "촉촉 립밤": 1050339042,
+      "DIY 수제비 토너 패드": 202944705,
+      "화산석 오일 컨트롤 롤러": 1337141345,
+      "시어버터 핸드크림": 1635291501,
+      "바디 워시": 2132279447,
+      "바디 로션": 1886270070,
+      "바디 케어 세트": 1329246249
+    };
 
-      formEl.submit(); 
-      for (const k of keys) delete cart[k]; 
-      render();
-      window.scrollTo({top:0,behavior:'smooth'}); 
-      alert('제출되었습니다.');
+    // 장바구니 상품들 → 각 항목 entry에 수량 저장
+    keys.forEach(k=>{
+      const p = productMap[k];
+      const q = cart[k];
+      const entryId = entryMap[p.name];
+      if(entryId){
+        fd.append(`entry.${entryId}`, q);
+      }
     });
+
+    // 총 수량
+    const totalQty = keys.reduce((sum,k)=> sum+cart[k],0);
+    fd.append("entry.307730166", totalQty);
+
+    // 결제 금액
+    const totalPrice = keys.reduce((sum,k)=> sum+(productMap[k].price*cart[k]),0);
+    fd.append("entry.1312485185", totalPrice);
+
+    // 전송
+    fetch("https://docs.google.com/forms/d/e/1FAIpQLScLEBK_7dlg1NY2qcan0z15Z9NtsB6hNzn8pBzoAzWrK7lyHg/formResponse", {
+      method:"POST",
+      mode:"no-cors",
+      body: fd
+    });
+
+    // 초기화
+    for(const k of keys) delete cart[k]; 
+    render();
+    window.scrollTo({top:0,behavior:'smooth'}); 
+    alert('제출되었습니다.');
+  });
+</script>
 
     async function loadProducts() {
       const res = await fetch("https://opensheet.elk.sh/1QpbkNSpsAoKhgMbCtHUhz97D5epuUqoGt7esf1-u-fw/sheet1");
