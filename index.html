@@ -9,39 +9,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
 
   <style>
- :root{
-  --bg:#f7f8fb; --card:#ffffff; --line:#e6e8f0; --fg:#0e1116; --muted:#6b7280; --accent:#2563eb; --ink:#ffffff;
-  --r-xl:14px; --r-md:12px; --shadow:0 8px 24px rgba(15,23,42,.06);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:14.5px/1.55 Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-}
-
-.page {
-  width:100%;
-  max-width:2360px;
-  margin:8px auto;
-  padding:0 14px;
-  display:grid;
-  grid-template-columns: 55% 45%; /* 메인 55%, 장바구니 45% */
-  column-gap:12px;               /* 카드 ↔ 장바구니 사이 간격 12px */
-  min-height:calc(100dvh - 16px);
-  overflow-x:hidden;
-  align-items:start;             /* 메인과 패널 상단 기준 정렬 */
-}
-
-main {margin-top:0;padding-top:0;align-self:start;}
-.cat{margin-top:0}
-.cat:first-child{margin-top:0 !important;} /* 첫 카테고리 여백 제거 */
-.cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
-
-/* 제품 카드 그리드: 무조건 4칸 */
+ /* 제품 카드 그리드: 무조건 4칸 */
 .grid {
   display:grid;
   grid-template-columns: repeat(4, 1fr); /* 항상 4칸 */
-  gap:10px; /* 카드 간격 */
+  gap:10px;
   align-items: stretch;
 }
 @media (max-width:880px){
@@ -57,18 +29,24 @@ main {margin-top:0;padding-top:0;align-self:start;}
   box-shadow:var(--shadow);
   display:flex;
   flex-direction:column;
-  justify-content:space-between; /* 위/아래 블록 균등 분배 */
-  gap:4px;                        /* 블록 간격 줄이기 */
+  justify-content:flex-start; /* 위쪽으로 붙임 */
+  gap:6px;                    /* 위쪽 블록과 버튼 사이 기본 간격 */
   cursor:pointer;
   transition:0.2s;
-  height:100%;
-  aspect-ratio:5/4; /* 세로 줄인 비율 */
+  height:auto;                /* 내용에 맞게 높이 */
+  aspect-ratio:auto;          /* 고정 비율 제거 */
 }
 .product.selected{
   border:2px solid var(--accent);
   box-shadow:0 0 0 3px rgba(37,99,235,0.2);
 }
-.topRow{display:flex;align-items:center;gap:8px;}
+
+/* 카드 상단(사진+이름+가격) */
+.topRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 .p-thumb{
   width:42px;
   height:42px;
@@ -87,41 +65,25 @@ main {margin-top:0;padding-top:0;align-self:start;}
   max-width:100%;
 }
 .p-price{font-size:12.5px;color:var(--accent);}
+
+/* 수량 조절 영역 */
 .qtyRow{
   display:flex;
   justify-content:center;
   align-items:center;
   gap:6px;
-  margin-top:2px; /* 위쪽과 최소 간격 */
+  margin-top:6px; /* 위 블록과 최소 여백 */
 }
 .btn{
-  border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
-  width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
+  border:1px solid var(--line);
+  background:#f3f5fa;
+  border-radius:8px;
+  width:28px;height:28px;
+  cursor:pointer;font-weight:800;font-size:16px;
   display:flex;align-items:center;justify-content:center;
 }
 .badge{min-width:34px;text-align:center;font-weight:800;}
 
-/* 장바구니 패널 */
-.panel{
-  flex:0 0 420px;   /* 기존보다 축소 */
-  min-width:360px;
-  max-width:480px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--r-xl);
-  padding:12px;
-  position:sticky;
-  top:0;
-  align-self:start; /* 메인과 같은 baseline */
-  box-shadow:var(--shadow);
-  max-height:calc(100dvh - 20px);
-  overflow:auto;
-}
-.panel h3{margin:0 0 8px;font-size:15px;font-weight:800}
-.empty{
-  padding:14px;border:1px dashed var(--line);border-radius:12px;
-  text-align:center;color:#6b7280;ba
-  
   </style>
 </head>
 <body>
