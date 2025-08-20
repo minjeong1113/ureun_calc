@@ -56,7 +56,17 @@
     thead th{background:#f6f7fb;font-weight:700;font-size:12.5px;padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0;}
     tbody td{padding:8px;border-bottom:1px solid var(--line);font-size:13.5px;}
     tbody tr:nth-child(even){background:#fafbff}
-    .nameCell{width:70%;} /* 상품명 칸 너비 줄이기 */
+    .nameCell {
+  width: 180px;            /* 상품명 칸 너비 고정 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 길면 ... 처리 */
+}
+
+td.priceCell,
+td.subtotalCell {
+  text-align: center;      /* 단가, 금액 가운데 정렬 */
+}
     .qtyCtl{display:inline-flex;align-items:center;gap:6px}
     .btn-sm{width:24px;height:24px;border:1px solid var(--line);background:#f3f5fa;border-radius:6px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center}
     .totals{margin-top:10px;display:flex;flex-direction:column;gap:6px}
@@ -146,11 +156,15 @@
         const p = productMap[k], q = cart[k], sub=q*p.price; 
         total+=sub; totalQty+=q;
         return `<tr data-key="${k}">
-          <td class="nameCell" title="${p.name}">${p.name}</td>
-          <td><div class="qtyCtl"><button class="btn-sm" data-act="minus">−</button><span>${q}</span><button class="btn-sm" data-act="plus">＋</button></div></td>
-          <td>${p.price.toLocaleString()}원</td>
-          <td>${sub.toLocaleString()}원</td>
-        </tr>`;
+  <td class="nameCell" title="${p.name}">${p.name}</td>
+  <td><div class="qtyCtl">
+    <button class="btn-sm" data-act="minus">−</button>
+    <span>${q}</span>
+    <button class="btn-sm" data-act="plus">＋</button>
+  </div></td>
+  <td class="priceCell">${p.price.toLocaleString()}원</td>
+  <td class="subtotalCell">${sub.toLocaleString()}원</td>
+</tr>`;
       }).join('');
 
       grandEl.textContent = `${total.toLocaleString()}원`;
