@@ -20,7 +20,7 @@
     }
 
     .page{max-width:2360px;margin:8px auto;padding:0 14px;
-      display:grid;grid-template-columns:3fr 2fr;column-gap:20px;row-gap:0; /* 세로 여백 제거 */
+      display:grid;grid-template-columns:3fr 2fr;column-gap:20px;row-gap:0;
       min-height:calc(100dvh - 16px);}
     
     .cat{margin-top:0}
@@ -36,17 +36,27 @@
       display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:0.2s;
     }
     .product.selected{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.2);}
-    .topRow{display:flex;align-items:center;gap:10px;}
-    .p-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#eef2f7;}
-    .p-info{flex:1;display:flex;flex-direction:column;gap:2px;}
-    .p-name{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .p-price{font-size:12.5px;color:var(--muted);}
-    .qtyRow{display:flex;justify-content:center;align-items:center;gap:6px;}
+    
+    /* 카드 상단 행: 이미지 + 가격 + +버튼 */
+    .cardTop{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .p-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;background:#eef2f7;}
+    .p-price{font-size:14px;font-weight:700;flex:1;text-align:center;}
     .btn{border:1px solid var(--line);background:#f3f5fa;border-radius:8px;
       width:28px;height:28px;cursor:pointer;font-weight:800;font-size:16px;
       display:flex;align-items:center;justify-content:center;}
-    .badge{min-width:34px;text-align:center;font-weight:800;}
-
+    
+    /* 중간 수량 표시 원형 */
+    .badgeCircle{
+      width:28px;height:28px;border-radius:50%;
+      border:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;margin:6px auto;
+    }
+    
+    /* 하단: 제품명 + -버튼 */
+    .cardBottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .p-name{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    
     .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
       padding:12px;position:sticky;top:0;align-self:start;box-shadow:var(--shadow);
       max-height:calc(100dvh - 20px);overflow:auto;min-width:560px;}
@@ -196,11 +206,17 @@
           const src=p.img.startsWith("http")?p.img:`${IMG_BASE}/${p.img}`;
           const card=document.createElement('div'); card.className='product'; card.id=`card-${key}`;
           card.innerHTML=`
-            <div class="topRow">
+            <div class="cardTop">
               <img class="p-thumb" alt="${p.name}" src="${src}">
-              <div class="p-info"><div class="p-name">${p.name}</div><div class="p-price">${p.price.toLocaleString()}원</div></div>
+              <div class="p-price">${p.price.toLocaleString()}원</div>
+              <button class="btn" data-act="plus">＋</button>
             </div>
-            <div class="qtyRow"><button class="btn" data-act="minus">−</button><div class="badge" id="badge-${key}">0</div><button class="btn" data-act="plus">＋</button></div>`;
+            <div class="badgeCircle" id="badge-${key}">0</div>
+            <div class="cardBottom">
+              <div class="p-name">${p.name}</div>
+              <button class="btn" data-act="minus">−</button>
+            </div>`;
+          
           card.addEventListener('click',(e)=>{
             const act=e.target?.dataset?.act;
             if(act==='minus'){ if((cart[key]||0)>0) cart[key]--; if(cart[key]===0) delete cart[key]; }
