@@ -19,16 +19,39 @@
       font:14.5px/1.55 Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     }
 
-    .page{max-width:2360px;margin:8px auto;padding:0 14px;
-      display:grid;grid-template-columns:3fr 2fr;column-gap:20px;row-gap:0;
-      min-height:calc(100dvh - 16px);}
-    
-    .cat{margin-top:0}
-    .cat h3{margin:2px 2px 6px;font-size:14px;font-weight:700;color:#111827;}
-    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-    @media (max-width:1800px){ .grid{grid-template-columns:repeat(4,1fr);} }
-    @media (max-width:1180px){ .grid{grid-template-columns:repeat(3,1fr);} }
-    @media (max-width:880px){ .grid{grid-template-columns:repeat(2,1fr);} }
+    .page {
+  max-width:2360px;
+  margin:8px auto;
+  padding:0 14px;
+  display:grid;
+  grid-template-columns: 3fr 1fr; /* 메인 3 : 패널 1 */
+  column-gap:20px;
+  min-height:calc(100dvh - 16px);
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr); /* 큰 화면은 무조건 4칸 */
+  gap:10px;
+}
+@media (max-width:1180px){ .grid{grid-template-columns:repeat(3,1fr);} }
+@media (max-width:880px){ .grid{grid-template-columns:repeat(2,1fr);} }
+
+.panel {
+  flex:0 0 480px;
+  max-width:30%;
+  min-width:400px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r-xl);
+  padding:12px;
+  position:sticky;
+  top:0;
+  align-self:start;
+  box-shadow:var(--shadow);
+  max-height:calc(100dvh - 20px);
+  overflow:auto;
+}
 
     .product{
       background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
