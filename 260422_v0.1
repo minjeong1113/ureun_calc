@@ -422,7 +422,7 @@
 
 <script>
   const SHEET_ID = "1QpbkNSpsAoKhgMbCtHUhz97D5epuUqoGt7esf1-u-fw";
-  const IMG_BASE = "images/v2";
+  const IMG_BASE = "images-v2";
 
   // 고정 entry ID
   const ENTRY_TIME     = "entry.641954362";
@@ -437,8 +437,8 @@
   // ── 데이터 로드 ──────────────────────────────────────────
   async function loadAll() {
     const [prodRows, giftRows] = await Promise.all([
-      fetch(`https://opensheet.elk.sh/${SHEET_ID}/%EC%83%81%ED%92%88%20%EB%AA%A9%EB%A1%9D`).then(r => r.json()),
-      fetch(`https://opensheet.elk.sh/${SHEET_ID}/%EC%82%AC%EC%9D%80%ED%92%88`).then(r => r.json()),
+      fetch(`https://opensheet.elk.sh/${SHEET_ID}/sheet1`).then(r => r.json()),
+      fetch(`https://opensheet.elk.sh/${SHEET_ID}/sheet2`).then(r => r.json()),
     ]);
 
     // 사은품 규칙 파싱
