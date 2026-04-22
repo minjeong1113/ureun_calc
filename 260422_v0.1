@@ -441,9 +441,12 @@
       fetch(`https://opensheet.elk.sh/${SHEET_ID}/sheet2`).then(r => r.json()),
     ]);
 
+    // 숫자 파싱 헬퍼
+    const parseNum = str => Number(String(str || "0").replace(/[^0-9]/g, ""));
+
     // 사은품 규칙 파싱
     giftRules = giftRows.map(r => ({
-      minAmt:  Number(String(r["구매 조건"] || "0").replace(/[^0-9]/g, "")),
+      minAmt:  parseNum(r["구매 조건"]),
       name:    r["상품명"] || "",
       entryId: r["entry ID"] || "",
     })).filter(g => g.name).sort((a, b) => a.minAmt - b.minAmt);
@@ -453,7 +456,7 @@
     prodRows.forEach((r, i) => {
       const cat = r["분류"] || "기타";
       if (!categories[cat]) categories[cat] = [];
-      const price = Number(String(r["판매가"] || "0").replace(/[^0-9]/g, ""));
+      const price = parseNum(r["판매가"]);
       const entryId = r["entry ID"] || "";
       const imgVal = r["이미지"] || "";
       const imgSrc = imgVal.startsWith("http") ? imgVal : `${IMG_BASE}/${imgVal}`;
