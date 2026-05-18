@@ -325,6 +325,20 @@
     .pay-btn:hover { background: #2e2e2a; }
     .pay-btn:active { transform: scale(0.98); }
     .pay-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .buyer-btn {
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--line);
+      border-radius: var(--r-md);
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: -0.2px;
+      transition: all 0.15s;
+    }
+    .buyer-btn:hover { border-color: var(--warn); color: var(--warn); background: #fff5f3; }
     .pay-note {
       text-align: center;
       font-size: 11px;
@@ -409,6 +423,7 @@
       </div>
 
       <button id="payBtn" class="pay-btn">주문 제출</button>
+      <button id="buyerBtn" class="buyer-btn">바이어 제공</button>
       <p class="pay-note">제출 후 모든 항목이 초기화됩니다</p>
     </div>
   </aside>
@@ -428,6 +443,7 @@
   const ENTRY_TIME     = "entry.641954362";
   const ENTRY_QTY      = "entry.2003813706";
   const ENTRY_AMOUNT   = "entry.1401654522";
+  const ENTRY_ORDER_TYPE = "entry.2098361840";
 
   // 사은품 규칙 (sheet2에서 동적 로드)
   let giftRules = [];   // [{ minAmt, name, entryId }, ...]
@@ -580,8 +596,8 @@
     render();
   });
 
-  // ── 결제 제출 ─────────────────────────────────────────────
-  document.getElementById("payBtn").addEventListener("click", () => {
+  // ── 공통 제출 함수 ───────────────────────────────────────
+  function submitOrder(isBuyer = false) {
     const keys = Object.keys(cart).filter(k => cart[k] > 0);
     if (!keys.length) { alert("상품을 선택해주세요."); return; }
 
@@ -594,8 +610,11 @@
       formEl.appendChild(inp);
     };
 
-    // 시간
+    const totalQty = keys.reduce((sum, k) => sum + cart[k], 0);
+    const totalAmt = keys.reduce((sum, k) => sum + cart[k] * productMap[k].price, 0);
+
     addInput(ENTRY_TIME, new Date().toISOString());
+    addInput(ENTRY_ORDER_TYPE, isBuyer ? "바이어 제공" : "일반 결제");
 
     // 상품별 수량
     keys.forEach(k => {
@@ -603,24 +622,25 @@
       if (p.entryId) addInput(p.entryId, cart[k]);
     });
 
-    // 사은품 (받는 경우 1, 없으면 0)
-    const total = keys.reduce((sum, k) => sum + cart[k] * productMap[k].price, 0);
-    const totalQty = keys.reduce((sum, k) => sum + cart[k], 0);
+    // 사은품 (바이어 제공이면 전부 0)
     giftRules.forEach(g => {
-      if (g.entryId) addInput(g.entryId, total >= g.minAmt ? 1 : 0);
+      if (g.entryId) addInput(g.entryId, (!isBuyer && totalAmt >= g.minAmt) ? 1 : 0);
     });
 
-    // 총 수량 / 결제금액
+    // 총 수량 / 결제금액 (바이어 제공이면 0원)
     addInput(ENTRY_QTY, totalQty);
-    addInput(ENTRY_AMOUNT, total);
+    addInput(ENTRY_AMOUNT, isBuyer ? 0 : totalAmt);
 
     formEl.submit();
-
-    // 초기화
     Object.keys(cart).forEach(k => delete cart[k]);
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    alert("주문이 제출되었습니다 🎉");
+    alert(isBuyer ? "바이어 제공으로 제출되었습니다 ✅" : "주문이 제출되었습니다 🎉");
+  }
+
+  document.getElementById("payBtn").addEventListener("click", () => submitOrder(false));
+  document.getElementById("buyerBtn").addEventListener("click", () => {
+    if (confirm("바이어 제공으로 제출할까요? (0원 처리, 사은품 없음)")) submitOrder(true);
   });
 
   loadAll();
