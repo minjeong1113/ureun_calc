@@ -423,7 +423,7 @@
       </div>
 
       <button id="payBtn" class="pay-btn">주문 제출</button>
-      <button id="buyerBtn" class="buyer-btn">바이어 제공</button>
+      <button id="buyerBtn" class="buyer-btn">제품 제공</button>
       <p class="pay-note">제출 후 모든 항목이 초기화됩니다</p>
     </div>
   </aside>
@@ -614,7 +614,7 @@
     const totalAmt = keys.reduce((sum, k) => sum + cart[k] * productMap[k].price, 0);
 
     addInput(ENTRY_TIME, new Date().toISOString());
-    addInput(ENTRY_ORDER_TYPE, isBuyer ? "바이어 제공" : "일반 결제");
+    addInput(ENTRY_ORDER_TYPE, isBuyer ? "제품 제공" : "일반 결제");
 
     // 상품별 수량
     keys.forEach(k => {
@@ -622,12 +622,12 @@
       if (p.entryId) addInput(p.entryId, cart[k]);
     });
 
-    // 사은품 (바이어 제공이면 전부 0)
+    // 사은품 (제품 제공이면 전부 0)
     giftRules.forEach(g => {
       if (g.entryId) addInput(g.entryId, (!isBuyer && totalAmt >= g.minAmt) ? 1 : 0);
     });
 
-    // 총 수량 / 결제금액 (바이어 제공이면 0원)
+    // 총 수량 / 결제금액 (제품 제공이면 0원)
     addInput(ENTRY_QTY, totalQty);
     addInput(ENTRY_AMOUNT, isBuyer ? 0 : totalAmt);
 
@@ -635,12 +635,12 @@
     Object.keys(cart).forEach(k => delete cart[k]);
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    alert(isBuyer ? "바이어 제공으로 제출되었습니다 ✅" : "주문이 제출되었습니다 🎉");
+    alert(isBuyer ? "제품 제공으로 제출되었습니다 ✅" : "주문이 제출되었습니다 🎉");
   }
 
   document.getElementById("payBtn").addEventListener("click", () => submitOrder(false));
   document.getElementById("buyerBtn").addEventListener("click", () => {
-    if (confirm("바이어 제공으로 제출할까요? (0원 처리, 사은품 없음)")) submitOrder(true);
+    if (confirm("제품 제공으로 제출할까요? (0원 처리, 사은품 없음)")) submitOrder(true);
   });
 
   loadAll();
